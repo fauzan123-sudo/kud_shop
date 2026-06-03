@@ -1,0 +1,42 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  errors:
+    missing_return: error
+    dead_code: error
+    unused_import: error
+    unused_local_variable: error
+
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.config.dart"
+    - "lib/firebase_options.dart"
+
+linter:
+  rules:
+    # ─── Code Style ───────────────────────────────────────────
+    prefer_single_quotes: true
+    prefer_const_constructors: true
+    prefer_const_declarations: true
+    prefer_final_locals: true
+    prefer_final_fields: true
+    unnecessary_this: true
+
+    # ─── Safety ───────────────────────────────────────────────
+    avoid_print: true
+    # avoid_empty_catch dihapus ← tidak dikenal
+    cancel_subscriptions: true
+    close_sinks: true
+
+    # ─── Flutter Specific ─────────────────────────────────────
+    use_build_context_synchronously: true
+    use_key_in_widget_constructors: true
+    sized_box_for_whitespace: true
+    avoid_unnecessary_containers: true
+
+    # ─── Performance ──────────────────────────────────────────
+    avoid_slow_async_io: true
+
+    # ─── Documentation ────────────────────────────────────────
+    slash_for_doc_comments: true

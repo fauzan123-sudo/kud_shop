@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "251025266222",
+    "project_id": "flutter-bloc-playground",
+    "storage_bucket": "flutter-bloc-playground.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:251025266222:android:df8c03507420725e7a31bf",
+        "android_client_info": {
+          "package_name": "com.example.flutter_ui_playground"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDa9E0NJEWCVhkk3MRFN5-DjtBA3ELFe1E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

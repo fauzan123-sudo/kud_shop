@@ -1,0 +1,105 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_ui_playground/core/constants/hive_manager.dart';
+import 'package:flutter_ui_playground/src/employee/domain/usecases/get_employee_by_id.dart';
+import 'package:flutter_ui_playground/src/employee/presentation/bloc/employee_detail_bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import '../network/dio_client.dart';
+import '../network/network_info.dart';
+// Auth
+import '../../src/auth/data/datasources/auth_remote_datasource.dart';
+import '../../src/auth/data/repositories/auth_repository_impl.dart';
+import '../../src/auth/domain/repositories/auth_repository.dart';
+import '../../src/auth/domain/usecases/login.dart';
+import '../../src/auth/domain/usecases/logout.dart';
+import '../../src/auth/presentation/bloc/auth_bloc.dart';
+// Profile
+import '../../src/profile/data/datasources/profile_remote_datasource.dart';
+import '../../src/profile/data/repositories/profile_repository_impl.dart';
+import '../../src/profile/domain/repositories/profile_repository.dart';
+import '../../src/profile/domain/usecases/get_profile.dart';
+import '../../src/profile/presentation/bloc/profile_bloc.dart';
+// Employee
+import '../../src/employee/data/datasources/employee_remote_datasource.dart';
+import '../../src/employee/data/repositories/employee_repository_impl.dart';
+import '../../src/employee/domain/repositories/employee_repository.dart';
+import '../../src/employee/domain/usecases/get_employees.dart';
+import '../../src/employee/presentation/bloc/employee_bloc.dart';
+import '../../src/employee/data/datasources/employee_local_datasource.dart';
+// Profile
+import '../../src/profile/data/datasources/profile_local_datasource.dart';
+
+final sl = GetIt.instance;
+
+void initDependencies() {
+  // ─── External ───────────────────────────────────────────────
+  sl.registerLazySingleton(
+    () => const FlutterSecureStorage(
+      iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+    ),
+  );
+  sl.registerLazySingleton(() => InternetConnection());
+  sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
+  sl.registerLazySingleton(() => DioClient(sl()));
+
+  // ─── Hive Boxes ─────────────────────────────────────────────
+  sl.registerLazySingleton(
+    () => HiveManager.employeeBox,
+    instanceName: 'employeeBox',
+  );
+  sl.registerLazySingleton(
+    () => HiveManager.profileBox,
+    instanceName: 'profileBox',
+  );
+
+  // ─── Auth ───────────────────────────────────────────────────
+  sl.registerLazySingleton<AuthRemoteDataSource>(
+    () => AuthRemoteDataSourceImpl(sl<DioClient>().dio),
+  );
+  sl.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(
+      remoteDataSource: sl(),
+      storage: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => Login(sl()));
+  sl.registerLazySingleton(() => Logout(sl()));
+  sl.registerFactory(() => AuthBloc(login: sl(), logout: sl()));
+
+  // ─── Employee ───────────────────────────────────────────────
+  sl.registerLazySingleton<EmployeeRemoteDataSource>(
+    () => EmployeeRemoteDataSourceImpl(sl<DioClient>().dio),
+  );
+  sl.registerLazySingleton<EmployeeLocalDataSource>(
+    () => EmployeeLocalDataSourceImpl(sl(instanceName: 'employeeBox')),
+  );
+  sl.registerLazySingleton<EmployeeRepository>(
+    () => EmployeeRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetEmployees(sl()));
+  sl.registerFactory(() => EmployeeBloc(sl()));
+  sl.registerLazySingleton(() => GetEmployeeById(sl()));
+  sl.registerFactory(() => EmployeeDetailBloc(sl()));
+
+  // ─── Profile ────────────────────────────────────────────────
+  sl.registerLazySingleton<ProfileRemoteDataSource>(
+    () => ProfileRemoteDataSourceImpl(sl<DioClient>().dio),
+  );
+  sl.registerLazySingleton<ProfileLocalDataSource>(
+    () => ProfileLocalDataSourceImpl(sl(instanceName: 'profileBox')),
+  );
+  sl.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetProfile(sl()));
+  sl.registerFactory(() => ProfileBloc(sl()));
+}

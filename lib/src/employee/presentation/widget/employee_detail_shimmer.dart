@@ -1,0 +1,83 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_ui_playground/component/widgets/loading/shimmer_widget.dart';
+
+class EmployeeDetailShimmer extends StatelessWidget {
+  const EmployeeDetailShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // shimmer header
+          Container(
+            width: double.infinity,
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 32),
+            child: Column(
+              children: [
+                ShimmerWidget.circular(size: 96),
+                const SizedBox(height: 16),
+                const ShimmerWidget.rectangular(width: 160, height: 22),
+                const SizedBox(height: 8),
+                const ShimmerWidget.rectangular(width: 100, height: 14),
+                const SizedBox(height: 8),
+                const ShimmerWidget.rectangular(width: 80, height: 24),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildShimmerCard(),
+          const SizedBox(height: 12),
+          _buildShimmerCard(),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerCard() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(10),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const ShimmerWidget.rectangular(width: 120, height: 13),
+          const SizedBox(height: 16),
+          _buildShimmerItem(),
+          const SizedBox(height: 16),
+          _buildShimmerItem(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerItem() {
+    return const Row(
+      children: [
+        ShimmerWidget.rectangular(width: 20, height: 20),
+        SizedBox(width: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ShimmerWidget.rectangular(width: 60, height: 12),
+            SizedBox(height: 4),
+            ShimmerWidget.rectangular(width: 180, height: 15),
+          ],
+        ),
+      ],
+    );
+  }
+}
