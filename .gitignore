@@ -53,3 +53,6 @@ google-services-base64.txt
 # Keystore - jangan di-push ke GitHub
 android/app/release.keystore
 android/key.properties
+
+# Environment variables - jangan di-push ke GitHub
+.env

@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
-import 'package:flutter_ui_playground/core/error/exception.dart';
-import 'package:flutter_ui_playground/src/profile/data/datasources/profile_local_datasource.dart';
+import 'package:kud_shop/core/error/exception.dart';
+import 'package:kud_shop/src/profile/data/datasources/profile_local_datasource.dart';
 import '../../../../core/error/error_handler.dart';
 import '../../../../core/error/failure.dart';
 import '../../../../core/network/network_info.dart';

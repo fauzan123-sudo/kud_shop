@@ -2,11 +2,11 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:flutter_ui_playground/core/error/failure.dart';
-import 'package:flutter_ui_playground/core/usecases/usecase.dart';
-import 'package:flutter_ui_playground/src/profile/presentation/bloc/profile_bloc.dart';
-import 'package:flutter_ui_playground/src/profile/presentation/bloc/profile_event.dart';
-import 'package:flutter_ui_playground/src/profile/presentation/bloc/profile_state.dart';
+import 'package:kud_shop/core/error/failure.dart';
+import 'package:kud_shop/core/usecases/usecase.dart';
+import 'package:kud_shop/src/profile/presentation/bloc/profile_bloc.dart';
+import 'package:kud_shop/src/profile/presentation/bloc/profile_event.dart';
+import 'package:kud_shop/src/profile/presentation/bloc/profile_state.dart';
 
 import '../../../../helpers/mock_helper.dart';
 import '../../../../helpers/test_helper.dart';

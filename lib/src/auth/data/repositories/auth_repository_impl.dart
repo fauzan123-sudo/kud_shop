@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_ui_playground/src/auth/data/models/auth_token_model.dart';
+import 'package:kud_shop/src/auth/data/models/auth_token_model.dart';
 import '../../../../core/error/error_handler.dart';
 import '../../../../core/error/failure.dart';
 import '../../../../core/network/network_info.dart';

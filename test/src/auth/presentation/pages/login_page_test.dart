@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:flutter_ui_playground/src/auth/presentation/bloc/auth_bloc.dart';
-import 'package:flutter_ui_playground/src/auth/presentation/bloc/auth_event.dart';
-import 'package:flutter_ui_playground/src/auth/presentation/bloc/auth_state.dart';
-import 'package:flutter_ui_playground/src/auth/presentation/widgets/login_header.dart';
-import 'package:flutter_ui_playground/src/auth/presentation/widgets/login_hint.dart';
-import 'package:flutter_ui_playground/src/auth/presentation/widgets/login_button.dart';
-import 'package:flutter_ui_playground/src/auth/presentation/widgets/username_field.dart';
-import 'package:flutter_ui_playground/src/auth/presentation/widgets/password_field.dart';
+import 'package:kud_shop/src/auth/presentation/bloc/auth_bloc.dart';
+import 'package:kud_shop/src/auth/presentation/bloc/auth_event.dart';
+import 'package:kud_shop/src/auth/presentation/bloc/auth_state.dart';
+import 'package:kud_shop/src/auth/presentation/widgets/login_header.dart';
+import 'package:kud_shop/src/auth/presentation/widgets/login_hint.dart';
+import 'package:kud_shop/src/auth/presentation/widgets/login_button.dart';
+import 'package:kud_shop/src/auth/presentation/widgets/username_field.dart';
+import 'package:kud_shop/src/auth/presentation/widgets/password_field.dart';
 
 // ← mock AuthBloc
 class MockAuthBloc extends MockBloc<AuthEvent, AuthState> implements AuthBloc {}

@@ -2,6 +2,10 @@ enum Flavor { dev, staging, production }
 
 class AppConfig {
   static Flavor flavor = Flavor.dev;
+  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL');
+  static const String supabaseAnonKey = String.fromEnvironment(
+    'SUPABASE_ANON_KEY',
+  );
 
   // ← baseUrl berbeda per flavor
   static String get baseUrl {
@@ -9,9 +13,9 @@ class AppConfig {
       case Flavor.dev:
         return 'https://dummyjson.com'; // development
       case Flavor.staging:
-        return 'https://dummyjson.com'; // staging  
+        return 'https://dummyjson.com'; // staging
       case Flavor.production:
-        return 'https://dummyjson.com'; // production  
+        return 'https://dummyjson.com'; // production
     }
   }
 

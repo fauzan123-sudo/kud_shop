@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_ui_playground/component/themes/app_theme.dart';
+import 'package:kud_shop/component/themes/app_theme.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'core/bootstrap/app_bootstrap.dart';

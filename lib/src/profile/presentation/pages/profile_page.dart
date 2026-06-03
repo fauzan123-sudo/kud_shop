@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_ui_playground/component/widgets/error_widget.dart';
-import 'package:flutter_ui_playground/src/profile/presentation/widget/logout_button.dart';
-import 'package:flutter_ui_playground/src/profile/presentation/widget/profile_header.dart';
-import 'package:flutter_ui_playground/src/profile/presentation/widget/profile_info_card.dart';
-import 'package:flutter_ui_playground/src/profile/presentation/widget/profile_shimmer.dart';
+import 'package:kud_shop/component/widgets/error_widget.dart';
+import 'package:kud_shop/src/profile/presentation/widget/logout_button.dart';
+import 'package:kud_shop/src/profile/presentation/widget/profile_header.dart';
+import 'package:kud_shop/src/profile/presentation/widget/profile_info_card.dart';
+import 'package:kud_shop/src/profile/presentation/widget/profile_shimmer.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/injection/injection.dart';
 import '../../../../core/navigation/app_routes.dart';

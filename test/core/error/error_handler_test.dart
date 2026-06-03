@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_ui_playground/core/error/error_handler.dart';
-import 'package:flutter_ui_playground/core/error/exception.dart';
-import 'package:flutter_ui_playground/core/error/failure.dart';
+import 'package:kud_shop/core/error/error_handler.dart';
+import 'package:kud_shop/core/error/exception.dart';
+import 'package:kud_shop/core/error/failure.dart';
 
 void main() {
   group('handleError', () {

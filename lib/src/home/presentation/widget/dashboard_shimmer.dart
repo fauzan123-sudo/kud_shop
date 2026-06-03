@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_ui_playground/component/widgets/loading/shimmer_widget.dart';
+import 'package:kud_shop/component/widgets/loading/shimmer_widget.dart';
 
 class DashboardShimmer extends StatelessWidget {
   const DashboardShimmer({super.key});

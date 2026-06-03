@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import 'package:flutter_ui_playground/core/usecases/usecase.dart';
+import 'package:kud_shop/core/usecases/usecase.dart';
 import '../../../../core/error/failure.dart';
 import '../entities/profile.dart';
 import '../repositories/profile_repository.dart';

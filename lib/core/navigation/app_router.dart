@@ -1,11 +1,9 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_ui_playground/core/injection/injection.dart';
-import 'package:flutter_ui_playground/src/auth/presentation/pages/login_page.dart';
-import 'package:flutter_ui_playground/src/employee/presentation/pages/employee_detail_page.dart';
-import 'package:flutter_ui_playground/src/home/presentation/pages/main_page.dart';
-import 'package:flutter_ui_playground/src/splash/presentation/splash_screen.dart';
+import 'package:kud_shop/core/injection/injection.dart';
+import 'package:kud_shop/src/auth/presentation/pages/login_page.dart';
+import 'package:kud_shop/src/splash/presentation/splash_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'app_routes.dart';
 
@@ -26,14 +24,6 @@ class AppRouter {
         path: AppRoutes.login,
         name: 'login',
         builder: (context, state) => const LoginPage(),
-      ),
-      GoRoute(
-        path: '${AppRoutes.employee}/:id', 
-        name: 'employee-detail',
-        builder: (context, state) {
-          final id = int.parse(state.pathParameters['id']!);
-          return EmployeeDetailPage(employeeId: id);
-        },
       ),
       GoRoute(
         path: AppRoutes.home,

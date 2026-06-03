@@ -15,7 +15,7 @@ val keyProperties = Properties()
 keyProperties.load(keyPropertiesFile.inputStream())
 
 android {
-    namespace = "com.example.flutter_ui_playground"
+    namespace = "com.example.kud_shop"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "28.2.13676358"
     compileOptions {
@@ -28,7 +28,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.flutter_ui_playground"
+        applicationId = "com.fauzan.kud_shop"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

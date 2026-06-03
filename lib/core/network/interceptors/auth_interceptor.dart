@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_ui_playground/core/config/app_config.dart';
+import 'package:kud_shop/core/config/app_config.dart';
 import '../../constants/storage_keys.dart';
 import '../../constants/api_endpoints.dart';
 import '../../constants/app_constants.dart';

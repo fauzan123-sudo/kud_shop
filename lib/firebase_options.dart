@@ -23,10 +23,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -50,20 +47,30 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyA-q_BtxJwg6OvmcU5sk9S_4DV1saKYEXY',
-    appId: '1:251025266222:web:8ebb92ff6fe951287a31bf',
-    messagingSenderId: '251025266222',
-    projectId: 'flutter-bloc-playground',
-    authDomain: 'flutter-bloc-playground.firebaseapp.com',
-    storageBucket: 'flutter-bloc-playground.firebasestorage.app',
-    measurementId: 'G-PZVNPBKS7W',
+    apiKey: 'AIzaSyDFt8NaED2p9gRoBGktq1MAgxo8fFf7ZxA',
+    appId: '1:219917704477:web:348637f18fdd113b7395f4',
+    messagingSenderId: '219917704477',
+    projectId: 'kud-shop-flutter',
+    authDomain: 'kud-shop-flutter.firebaseapp.com',
+    storageBucket: 'kud-shop-flutter.firebasestorage.app',
+    measurementId: 'G-P7Q09ELLNE',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDa9E0NJEWCVhkk3MRFN5-DjtBA3ELFe1E',
-    appId: '1:251025266222:android:df8c03507420725e7a31bf',
-    messagingSenderId: '251025266222',
-    projectId: 'flutter-bloc-playground',
-    storageBucket: 'flutter-bloc-playground.firebasestorage.app',
+    apiKey: 'AIzaSyBOykSIXKJ5QZutb_yTc9-UrPPwJuNunTo',
+    appId: '1:219917704477:android:591c27e24d8cb68a7395f4',
+    messagingSenderId: '219917704477',
+    projectId: 'kud-shop-flutter',
+    storageBucket: 'kud-shop-flutter.firebasestorage.app',
   );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyByMzRclunCnWjiCs0jq8R9lsxSk095hO4',
+    appId: '1:219917704477:ios:bcc5493a11c906237395f4',
+    messagingSenderId: '219917704477',
+    projectId: 'kud-shop-flutter',
+    storageBucket: 'kud-shop-flutter.firebasestorage.app',
+    iosBundleId: 'com.example.flutterUiPlayground',
+  );
+
 }

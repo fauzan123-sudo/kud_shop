@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_ui_playground/src/auth/presentation/widgets/login_button.dart';
-import 'package:flutter_ui_playground/src/auth/presentation/widgets/login_header.dart';
-import 'package:flutter_ui_playground/src/auth/presentation/widgets/login_hint.dart';
-import 'package:flutter_ui_playground/src/auth/presentation/widgets/password_field.dart';
-import 'package:flutter_ui_playground/src/auth/presentation/widgets/username_field.dart';
+import 'package:kud_shop/src/auth/presentation/widgets/login_button.dart';
+import 'package:kud_shop/src/auth/presentation/widgets/login_header.dart';
+import 'package:kud_shop/src/auth/presentation/widgets/login_hint.dart';
+import 'package:kud_shop/src/auth/presentation/widgets/password_field.dart';
+import 'package:kud_shop/src/auth/presentation/widgets/username_field.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import '../../../../core/injection/injection.dart';

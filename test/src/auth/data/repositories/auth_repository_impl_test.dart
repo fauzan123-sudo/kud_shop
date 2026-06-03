@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:flutter_ui_playground/core/error/failure.dart';
-import 'package:flutter_ui_playground/src/auth/data/repositories/auth_repository_impl.dart';
+import 'package:kud_shop/core/error/failure.dart';
+import 'package:kud_shop/src/auth/data/repositories/auth_repository_impl.dart';
 
 import '../../../../helpers/mock_helper.dart';
 import '../../../../helpers/test_helper.dart';

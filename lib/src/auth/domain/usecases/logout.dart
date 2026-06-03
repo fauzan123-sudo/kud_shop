@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
-import 'package:flutter_ui_playground/core/error/failure.dart';
-import 'package:flutter_ui_playground/core/usecases/usecase.dart';
-import 'package:flutter_ui_playground/src/auth/domain/repositories/auth_repository.dart';
+import 'package:kud_shop/core/error/failure.dart';
+import 'package:kud_shop/core/usecases/usecase.dart';
+import 'package:kud_shop/src/auth/domain/repositories/auth_repository.dart';
 
 class Logout extends UseCase<void, NoParams> {
   final AuthRepository repository;

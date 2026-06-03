@@ -1,9 +1,7 @@
-import 'package:flutter_ui_playground/src/auth/data/models/auth_token_model.dart';
-import 'package:flutter_ui_playground/src/auth/domain/entities/auth_token.dart';
-import 'package:flutter_ui_playground/src/employee/data/models/employee_model.dart';
-import 'package:flutter_ui_playground/src/employee/domain/entities/employee.dart';
-import 'package:flutter_ui_playground/src/profile/data/models/profile_model.dart';
-import 'package:flutter_ui_playground/src/profile/domain/entities/profile.dart';
+import 'package:kud_shop/src/auth/data/models/auth_token_model.dart';
+import 'package:kud_shop/src/auth/domain/entities/auth_token.dart';
+import 'package:kud_shop/src/profile/data/models/profile_model.dart';
+import 'package:kud_shop/src/profile/domain/entities/profile.dart';
 
 // ─── Auth ────────────────────────────────────────────────────
 const tAuthToken = AuthToken(
@@ -25,32 +23,6 @@ const tAuthTokenModel = AuthTokenModel(
   firstName:    'Emily',
   lastName:     'Johnson',
 );
-
-// ─── Employee ────────────────────────────────────────────────
-const tEmployee = Employee(
-  id:         1,
-  name:       'Emily Johnson',
-  email:      'emily.johnson@x.dummyjson.com',
-  phone:      '+81 965-431-3024',
-  position:   'Software Engineer',
-  department: 'Engineering',
-  avatarUrl:  'https://dummyjson.com/icon/emilys/128',
-  isActive:   true,
-);
-
-const tEmployeeList = [tEmployee];
-
-const tEmployeeModel = EmployeeModel(
-  id:        1,
-  firstName: 'Emily',
-  lastName:  'Johnson',
-  email:     'emily.johnson@x.dummyjson.com',
-  phone:     '+81 965-431-3024',
-  image:     'https://dummyjson.com/icon/emilys/128',
-  company:   {'title': 'Software Engineer', 'department': 'Engineering'},
-);
-
-final tEmployeeModelList = [tEmployeeModel]; // ← pastikan baris ini ada
 
 // ─── Profile ─────────────────────────────────────────────────
 const tProfile = Profile(

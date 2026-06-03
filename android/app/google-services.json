@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "251025266222",
-    "project_id": "flutter-bloc-playground",
-    "storage_bucket": "flutter-bloc-playground.firebasestorage.app"
+    "project_number": "219917704477",
+    "project_id": "kud-shop-flutter",
+    "storage_bucket": "kud-shop-flutter.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:251025266222:android:df8c03507420725e7a31bf",
+        "mobilesdk_app_id": "1:219917704477:android:591c27e24d8cb68a7395f4",
         "android_client_info": {
-          "package_name": "com.example.flutter_ui_playground"
+          "package_name": "com.fauzan.kud_shop"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDa9E0NJEWCVhkk3MRFN5-DjtBA3ELFe1E"
+          "current_key": "AIzaSyBOykSIXKJ5QZutb_yTc9-UrPPwJuNunTo"
         }
       ],
       "services": {

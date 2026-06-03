@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:flutter_ui_playground/core/error/exception.dart';
-import 'package:flutter_ui_playground/core/error/failure.dart';
-import 'package:flutter_ui_playground/src/profile/data/models/profile_model.dart';
-import 'package:flutter_ui_playground/src/profile/data/repositories/profile_repository_impl.dart';
+import 'package:kud_shop/core/error/exception.dart';
+import 'package:kud_shop/core/error/failure.dart';
+import 'package:kud_shop/src/profile/data/models/profile_model.dart';
+import 'package:kud_shop/src/profile/data/repositories/profile_repository_impl.dart';
 
 import '../../../../helpers/mock_helper.dart';
 import '../../../../helpers/test_helper.dart';

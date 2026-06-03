@@ -12,7 +12,7 @@
 -keep class com.google.firebase.crashlytics.** { *; }
 
 # Hive
--keep class com.example.flutter_ui_playground.** { *; }
+-keep class com.example.kud_shop.** { *; }
 -keepattributes *Annotation*
 
 # Flutter Secure Storage

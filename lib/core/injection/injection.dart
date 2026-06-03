@@ -1,7 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_ui_playground/core/constants/hive_manager.dart';
-import 'package:flutter_ui_playground/src/employee/domain/usecases/get_employee_by_id.dart';
-import 'package:flutter_ui_playground/src/employee/presentation/bloc/employee_detail_bloc.dart';
+import 'package:kud_shop/core/constants/hive_manager.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import '../network/dio_client.dart';
@@ -19,13 +17,7 @@ import '../../src/profile/data/repositories/profile_repository_impl.dart';
 import '../../src/profile/domain/repositories/profile_repository.dart';
 import '../../src/profile/domain/usecases/get_profile.dart';
 import '../../src/profile/presentation/bloc/profile_bloc.dart';
-// Employee
-import '../../src/employee/data/datasources/employee_remote_datasource.dart';
-import '../../src/employee/data/repositories/employee_repository_impl.dart';
-import '../../src/employee/domain/repositories/employee_repository.dart';
-import '../../src/employee/domain/usecases/get_employees.dart';
-import '../../src/employee/presentation/bloc/employee_bloc.dart';
-import '../../src/employee/data/datasources/employee_local_datasource.dart';
+
 // Profile
 import '../../src/profile/data/datasources/profile_local_datasource.dart';
 
@@ -67,24 +59,6 @@ void initDependencies() {
   sl.registerLazySingleton(() => Logout(sl()));
   sl.registerFactory(() => AuthBloc(login: sl(), logout: sl()));
 
-  // ─── Employee ───────────────────────────────────────────────
-  sl.registerLazySingleton<EmployeeRemoteDataSource>(
-    () => EmployeeRemoteDataSourceImpl(sl<DioClient>().dio),
-  );
-  sl.registerLazySingleton<EmployeeLocalDataSource>(
-    () => EmployeeLocalDataSourceImpl(sl(instanceName: 'employeeBox')),
-  );
-  sl.registerLazySingleton<EmployeeRepository>(
-    () => EmployeeRepositoryImpl(
-      remoteDataSource: sl(),
-      localDataSource: sl(),
-      networkInfo: sl(),
-    ),
-  );
-  sl.registerLazySingleton(() => GetEmployees(sl()));
-  sl.registerFactory(() => EmployeeBloc(sl()));
-  sl.registerLazySingleton(() => GetEmployeeById(sl()));
-  sl.registerFactory(() => EmployeeDetailBloc(sl()));
 
   // ─── Profile ────────────────────────────────────────────────
   sl.registerLazySingleton<ProfileRemoteDataSource>(

@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_ui_playground/core/constants/api_endpoints.dart';
+import 'package:kud_shop/core/constants/api_endpoints.dart';
 import '../models/profile_model.dart';
 
 abstract class ProfileRemoteDataSource {

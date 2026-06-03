@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_ui_playground/core/usecases/usecase.dart';
+import 'package:kud_shop/core/usecases/usecase.dart';
 import '../../domain/usecases/get_profile.dart';
 import 'profile_event.dart';
 import 'profile_state.dart';

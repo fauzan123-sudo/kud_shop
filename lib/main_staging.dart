@@ -1,4 +1,4 @@
-import 'package:flutter_ui_playground/core/config/app_config.dart';
+import 'package:kud_shop/core/config/app_config.dart';
 import 'main.dart' as app;
 
 void main() {

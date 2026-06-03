@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:flutter_ui_playground/core/usecases/usecase.dart';
-import 'package:flutter_ui_playground/src/auth/domain/usecases/logout.dart';
+import 'package:kud_shop/core/usecases/usecase.dart';
+import 'package:kud_shop/src/auth/domain/usecases/logout.dart';
 
 import '../../../../helpers/mock_helper.dart';
 

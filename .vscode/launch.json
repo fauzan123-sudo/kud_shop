@@ -5,19 +5,34 @@
             "name": "Development",
             "request": "launch",
             "type": "dart",
-            "program": "lib/main_dev.dart" //  entry point dev
+            "program": "lib/main_dev.dart", //  entry point development
+            "args": [
+                "--dart-define=SUPABASE_URL=https://ebvyjtwjfvpfvysudnwt.supabase.co",
+                "--dart-define=SUPABASE_ANON_KEY=sb_publishable_-sQOlLtTkDlevP8EgpTbJA_SsVx0dvK",
+                "--dart-define=FLAVOR=dev"
+            ]
         },
         {
             "name": "Staging",
             "request": "launch",
             "type": "dart",
-            "program": "lib/main_staging.dart" //  entry point staging
+            "program": "lib/main_staging.dart", //  entry point staging
+            "args": [
+                "--dart-define=SUPABASE_URL=https://ebvyjtwjfvpfvysudnwt.supabase.co",
+                "--dart-define=SUPABASE_ANON_KEY=sb_publishable_-sQOlLtTkDlevP8EgpTbJA_SsVx0dvK",
+                "--dart-define=FLAVOR=staging"
+            ]
         },
         {
             "name": "Production",
             "request": "launch",
             "type": "dart",
             "program": "lib/main_production.dart", //  entry point production
+            "args": [
+                "--dart-define=SUPABASE_URL=https://ebvyjtwjfvpfvysudnwt.supabase.co",
+                "--dart-define=SUPABASE_ANON_KEY=sb_publishable_-sQOlLtTkDlevP8EgpTbJA_SsVx0dvK",
+                "--dart-define=FLAVOR=production"
+            ],
             "flutterMode": "release"
         }
     ]

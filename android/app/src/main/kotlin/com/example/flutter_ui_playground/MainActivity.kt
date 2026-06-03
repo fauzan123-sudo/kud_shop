@@ -1,4 +1,4 @@
-package com.example.flutter_ui_playground
+package com.example.kud_shop
 
 import io.flutter.embedding.android.FlutterActivity
 
