@@ -1,49 +1,42 @@
 import 'package:dartz/dartz.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kud_shop/src/auth/data/models/auth_token_model.dart';
+import 'package:kud_shop/src/auth/data/models/user_model.dart';
 import '../../../../core/error/error_handler.dart';
 import '../../../../core/error/failure.dart';
-import '../../../../core/network/network_info.dart';
-import '../../domain/entities/auth_token.dart';
+import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../datasources/auth_remote_datasource.dart';
-
-import '../../../../core/constants/storage_keys.dart';
+import '../datasources/auth_supabase_datasource.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final AuthRemoteDataSource remoteDataSource;
-  final FlutterSecureStorage storage;
-  final NetworkInfo networkInfo;
+  final AuthSupabaseDataSource dataSource;
 
-  AuthRepositoryImpl({
-    required this.remoteDataSource,
-    required this.storage,
-    required this.networkInfo,
-  });
+  AuthRepositoryImpl({required this.dataSource});
 
   @override
-  Future<Either<Failure, AuthToken>> login({
-    required String username,
+  Future<Either<Failure, UserEntity>> login({
+    required String email,
     required String password,
   }) async {
-    if (!await networkInfo.isConnected) return const Left(NetworkFailure());
     try {
-      final result = await remoteDataSource.login(
-        username: username,
+      final result = await dataSource.login(email: email, password: password);
+      return Right(result.toEntity());
+    } catch (e) {
+      return handleError(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserEntity>> register({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final result = await dataSource.register(
+        name: name,
+        email: email,
         password: password,
       );
-      final token = result.toEntity();
-      await storage.write(
-        key: StorageKeys.accessToken,
-        value: token.accessToken,
-      );
-      await storage.write(
-        key: StorageKeys.refreshToken,
-        value: token.refreshToken,
-      );
-      await storage.write(key: StorageKeys.userName, value: token.fullName);
-      await storage.write(key: StorageKeys.userEmail, value: token.email);
-      return Right(token);
+      return Right(result.toEntity());
     } catch (e) {
       return handleError(e);
     }
@@ -52,8 +45,18 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, void>> logout() async {
     try {
-      await storage.deleteAll();
+      await dataSource.logout();
       return const Right(null);
+    } catch (e) {
+      return handleError(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserEntity>> getCurrentUser() async {
+    try {
+      final result = await dataSource.getCurrentUser();
+      return Right(result.toEntity());
     } catch (e) {
       return handleError(e);
     }

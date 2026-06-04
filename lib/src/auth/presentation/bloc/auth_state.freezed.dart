@@ -55,14 +55,15 @@ extension AuthStatePatterns on AuthState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( AuthInitial value)?  initial,TResult Function( AuthLoading value)?  loading,TResult Function( AuthAuthenticated value)?  authenticated,TResult Function( AuthUnauthenticated value)?  unauthenticated,TResult Function( AuthError value)?  error,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( AuthInitial value)?  initial,TResult Function( AuthLoading value)?  loading,TResult Function( AuthAuthenticated value)?  authenticated,TResult Function( AuthUnauthenticated value)?  unauthenticated,TResult Function( AuthRegisterSuccess value)?  registerSuccess,TResult Function( AuthError value)?  error,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case AuthInitial() when initial != null:
 return initial(_that);case AuthLoading() when loading != null:
 return loading(_that);case AuthAuthenticated() when authenticated != null:
 return authenticated(_that);case AuthUnauthenticated() when unauthenticated != null:
-return unauthenticated(_that);case AuthError() when error != null:
+return unauthenticated(_that);case AuthRegisterSuccess() when registerSuccess != null:
+return registerSuccess(_that);case AuthError() when error != null:
 return error(_that);case _:
   return orElse();
 
@@ -81,14 +82,15 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( AuthInitial value)  initial,required TResult Function( AuthLoading value)  loading,required TResult Function( AuthAuthenticated value)  authenticated,required TResult Function( AuthUnauthenticated value)  unauthenticated,required TResult Function( AuthError value)  error,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( AuthInitial value)  initial,required TResult Function( AuthLoading value)  loading,required TResult Function( AuthAuthenticated value)  authenticated,required TResult Function( AuthUnauthenticated value)  unauthenticated,required TResult Function( AuthRegisterSuccess value)  registerSuccess,required TResult Function( AuthError value)  error,}){
 final _that = this;
 switch (_that) {
 case AuthInitial():
 return initial(_that);case AuthLoading():
 return loading(_that);case AuthAuthenticated():
 return authenticated(_that);case AuthUnauthenticated():
-return unauthenticated(_that);case AuthError():
+return unauthenticated(_that);case AuthRegisterSuccess():
+return registerSuccess(_that);case AuthError():
 return error(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
@@ -103,14 +105,15 @@ return error(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( AuthInitial value)?  initial,TResult? Function( AuthLoading value)?  loading,TResult? Function( AuthAuthenticated value)?  authenticated,TResult? Function( AuthUnauthenticated value)?  unauthenticated,TResult? Function( AuthError value)?  error,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( AuthInitial value)?  initial,TResult? Function( AuthLoading value)?  loading,TResult? Function( AuthAuthenticated value)?  authenticated,TResult? Function( AuthUnauthenticated value)?  unauthenticated,TResult? Function( AuthRegisterSuccess value)?  registerSuccess,TResult? Function( AuthError value)?  error,}){
 final _that = this;
 switch (_that) {
 case AuthInitial() when initial != null:
 return initial(_that);case AuthLoading() when loading != null:
 return loading(_that);case AuthAuthenticated() when authenticated != null:
 return authenticated(_that);case AuthUnauthenticated() when unauthenticated != null:
-return unauthenticated(_that);case AuthError() when error != null:
+return unauthenticated(_that);case AuthRegisterSuccess() when registerSuccess != null:
+return registerSuccess(_that);case AuthError() when error != null:
 return error(_that);case _:
   return null;
 
@@ -128,13 +131,14 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function()?  authenticated,TResult Function()?  unauthenticated,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( UserEntity user)?  authenticated,TResult Function()?  unauthenticated,TResult Function( UserEntity user)?  registerSuccess,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case AuthInitial() when initial != null:
 return initial();case AuthLoading() when loading != null:
 return loading();case AuthAuthenticated() when authenticated != null:
-return authenticated();case AuthUnauthenticated() when unauthenticated != null:
-return unauthenticated();case AuthError() when error != null:
+return authenticated(_that.user);case AuthUnauthenticated() when unauthenticated != null:
+return unauthenticated();case AuthRegisterSuccess() when registerSuccess != null:
+return registerSuccess(_that.user);case AuthError() when error != null:
 return error(_that.message);case _:
   return orElse();
 
@@ -153,13 +157,14 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function()  authenticated,required TResult Function()  unauthenticated,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( UserEntity user)  authenticated,required TResult Function()  unauthenticated,required TResult Function( UserEntity user)  registerSuccess,required TResult Function( String message)  error,}) {final _that = this;
 switch (_that) {
 case AuthInitial():
 return initial();case AuthLoading():
 return loading();case AuthAuthenticated():
-return authenticated();case AuthUnauthenticated():
-return unauthenticated();case AuthError():
+return authenticated(_that.user);case AuthUnauthenticated():
+return unauthenticated();case AuthRegisterSuccess():
+return registerSuccess(_that.user);case AuthError():
 return error(_that.message);}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -174,13 +179,14 @@ return error(_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function()?  authenticated,TResult? Function()?  unauthenticated,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( UserEntity user)?  authenticated,TResult? Function()?  unauthenticated,TResult? Function( UserEntity user)?  registerSuccess,TResult? Function( String message)?  error,}) {final _that = this;
 switch (_that) {
 case AuthInitial() when initial != null:
 return initial();case AuthLoading() when loading != null:
 return loading();case AuthAuthenticated() when authenticated != null:
-return authenticated();case AuthUnauthenticated() when unauthenticated != null:
-return unauthenticated();case AuthError() when error != null:
+return authenticated(_that.user);case AuthUnauthenticated() when unauthenticated != null:
+return unauthenticated();case AuthRegisterSuccess() when registerSuccess != null:
+return registerSuccess(_that.user);case AuthError() when error != null:
 return error(_that.message);case _:
   return null;
 
@@ -257,33 +263,76 @@ String toString() {
 
 
 class AuthAuthenticated implements AuthState {
-  const AuthAuthenticated();
+  const AuthAuthenticated(this.user);
   
 
+ final  UserEntity user;
 
-
+/// Create a copy of AuthState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$AuthAuthenticatedCopyWith<AuthAuthenticated> get copyWith => _$AuthAuthenticatedCopyWithImpl<AuthAuthenticated>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthAuthenticated);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthAuthenticated&&(identical(other.user, user) || other.user == user));
 }
 
 
 @override
-int get hashCode => runtimeType.hashCode;
+int get hashCode => Object.hash(runtimeType,user);
 
 @override
 String toString() {
-  return 'AuthState.authenticated()';
+  return 'AuthState.authenticated(user: $user)';
 }
 
 
 }
 
+/// @nodoc
+abstract mixin class $AuthAuthenticatedCopyWith<$Res> implements $AuthStateCopyWith<$Res> {
+  factory $AuthAuthenticatedCopyWith(AuthAuthenticated value, $Res Function(AuthAuthenticated) _then) = _$AuthAuthenticatedCopyWithImpl;
+@useResult
+$Res call({
+ UserEntity user
+});
 
 
+$UserEntityCopyWith<$Res> get user;
+
+}
+/// @nodoc
+class _$AuthAuthenticatedCopyWithImpl<$Res>
+    implements $AuthAuthenticatedCopyWith<$Res> {
+  _$AuthAuthenticatedCopyWithImpl(this._self, this._then);
+
+  final AuthAuthenticated _self;
+  final $Res Function(AuthAuthenticated) _then;
+
+/// Create a copy of AuthState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? user = null,}) {
+  return _then(AuthAuthenticated(
+null == user ? _self.user : user // ignore: cast_nullable_to_non_nullable
+as UserEntity,
+  ));
+}
+
+/// Create a copy of AuthState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserEntityCopyWith<$Res> get user {
+  
+  return $UserEntityCopyWith<$Res>(_self.user, (value) {
+    return _then(_self.copyWith(user: value));
+  });
+}
+}
 
 /// @nodoc
 
@@ -316,6 +365,81 @@ String toString() {
 
 
 
+
+/// @nodoc
+
+
+class AuthRegisterSuccess implements AuthState {
+  const AuthRegisterSuccess(this.user);
+  
+
+ final  UserEntity user;
+
+/// Create a copy of AuthState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$AuthRegisterSuccessCopyWith<AuthRegisterSuccess> get copyWith => _$AuthRegisterSuccessCopyWithImpl<AuthRegisterSuccess>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthRegisterSuccess&&(identical(other.user, user) || other.user == user));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,user);
+
+@override
+String toString() {
+  return 'AuthState.registerSuccess(user: $user)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $AuthRegisterSuccessCopyWith<$Res> implements $AuthStateCopyWith<$Res> {
+  factory $AuthRegisterSuccessCopyWith(AuthRegisterSuccess value, $Res Function(AuthRegisterSuccess) _then) = _$AuthRegisterSuccessCopyWithImpl;
+@useResult
+$Res call({
+ UserEntity user
+});
+
+
+$UserEntityCopyWith<$Res> get user;
+
+}
+/// @nodoc
+class _$AuthRegisterSuccessCopyWithImpl<$Res>
+    implements $AuthRegisterSuccessCopyWith<$Res> {
+  _$AuthRegisterSuccessCopyWithImpl(this._self, this._then);
+
+  final AuthRegisterSuccess _self;
+  final $Res Function(AuthRegisterSuccess) _then;
+
+/// Create a copy of AuthState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? user = null,}) {
+  return _then(AuthRegisterSuccess(
+null == user ? _self.user : user // ignore: cast_nullable_to_non_nullable
+as UserEntity,
+  ));
+}
+
+/// Create a copy of AuthState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserEntityCopyWith<$Res> get user {
+  
+  return $UserEntityCopyWith<$Res>(_self.user, (value) {
+    return _then(_self.copyWith(user: value));
+  });
+}
+}
 
 /// @nodoc
 

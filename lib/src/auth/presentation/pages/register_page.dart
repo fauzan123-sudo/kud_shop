@@ -1,35 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/navigation/app_routes.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  void _onLogin() {
+  void _onRegister() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(
-        AuthEvent.login(
+        AuthEvent.register(
+          name: _nameController.text.trim(),
           email: _emailController.text.trim(),
           password: _passwordController.text,
         ),
@@ -51,6 +56,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             );
           }
+          // registerSuccess ditangani oleh router redirect
         },
         child: SafeArea(
           child: SingleChildScrollView(
@@ -60,25 +66,26 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 48),
 
-                  // ─── Header ──────────────────────────────
-                  Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade600,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Icon(
-                      Icons.storefront,
-                      color: Colors.white,
-                      size: 32,
+                  // ─── Back Button ─────────────────────────
+                  GestureDetector(
+                    onTap: () => context.pop(),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.arrow_back_ios_new, size: 16),
                     ),
                   ),
                   const SizedBox(height: 24),
+
+                  // ─── Header ──────────────────────────────
                   const Text(
-                    'Selamat datang',
+                    'Buat Akun',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -87,10 +94,32 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Masuk ke akun Anda',
+                    'Daftar untuk mulai berbelanja',
                     style: TextStyle(fontSize: 15, color: Colors.grey.shade600),
                   ),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 32),
+
+                  // ─── Nama ────────────────────────────────
+                  _buildLabel('Nama Lengkap'),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _nameController,
+                    textCapitalization: TextCapitalization.words,
+                    decoration: _inputDecoration(
+                      hint: 'Masukkan nama lengkap',
+                      icon: Icons.person_outline,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Nama wajib diisi';
+                      }
+                      if (value.trim().length < 3) {
+                        return 'Nama minimal 3 karakter';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
 
                   // ─── Email ───────────────────────────────
                   _buildLabel('Email'),
@@ -122,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                     obscureText: _obscurePassword,
                     decoration:
                         _inputDecoration(
-                          hint: '••••••••',
+                          hint: 'Minimal 8 karakter',
                           icon: Icons.lock_outline,
                         ).copyWith(
                           suffixIcon: IconButton(
@@ -146,9 +175,44 @@ class _LoginPageState extends State<LoginPage> {
                       return null;
                     },
                   ),
+                  const SizedBox(height: 16),
+
+                  // ─── Konfirmasi Password ─────────────────
+                  _buildLabel('Konfirmasi Password'),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _confirmPasswordController,
+                    obscureText: _obscureConfirmPassword,
+                    decoration:
+                        _inputDecoration(
+                          hint: 'Ulangi password',
+                          icon: Icons.lock_outline,
+                        ).copyWith(
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureConfirmPassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () => setState(
+                              () => _obscureConfirmPassword =
+                                  !_obscureConfirmPassword,
+                            ),
+                          ),
+                        ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Konfirmasi password wajib diisi';
+                      }
+                      if (value != _passwordController.text) {
+                        return 'Password tidak cocok';
+                      }
+                      return null;
+                    },
+                  ),
                   const SizedBox(height: 32),
 
-                  // ─── Login Button ────────────────────────
+                  // ─── Register Button ─────────────────────
                   BlocBuilder<AuthBloc, AuthState>(
                     builder: (context, state) {
                       final isLoading = state is AuthLoading;
@@ -156,7 +220,7 @@ class _LoginPageState extends State<LoginPage> {
                         width: double.infinity,
                         height: 52,
                         child: ElevatedButton(
-                          onPressed: isLoading ? null : _onLogin,
+                          onPressed: isLoading ? null : _onRegister,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue.shade600,
                             foregroundColor: Colors.white,
@@ -175,7 +239,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 )
                               : const Text(
-                                  'Masuk',
+                                  'Daftar',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -187,18 +251,18 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 24),
 
-                  // ─── Register Link ───────────────────────
+                  // ─── Login Link ──────────────────────────
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Belum punya akun? ',
+                        'Sudah punya akun? ',
                         style: TextStyle(color: Colors.grey.shade600),
                       ),
                       GestureDetector(
-                        onTap: () => context.push(AppRoutes.register),
+                        onTap: () => context.pop(),
                         child: Text(
-                          'Daftar',
+                          'Masuk',
                           style: TextStyle(
                             color: Colors.blue.shade600,
                             fontWeight: FontWeight.w600,

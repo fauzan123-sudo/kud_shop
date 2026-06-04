@@ -8,8 +8,7 @@ import 'core/config/app_config.dart';
 import 'core/navigation/app_router.dart';
 
 Future<void> main() async {
-  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  await AppBootstrap.init(widgetsBinding);
+  await AppBootstrap.init();
   runApp(const MyApp());
 }
 
@@ -34,7 +33,7 @@ class MyApp extends StatelessWidget {
       ),
       child: MaterialApp.router(
         debugShowCheckedModeBanner: AppConfig.showDebugBanner,
-        routerConfig: AppRouter.router,
+        routerConfig: AppRouter.createRouter(),
         title: AppConfig.appName,
         theme: AppTheme.lightTheme,
         builder: (context, child) => ResponsiveBreakpoints.builder(

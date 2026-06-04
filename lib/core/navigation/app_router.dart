@@ -1,55 +1,250 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kud_shop/core/injection/injection.dart';
-import 'package:kud_shop/src/auth/presentation/pages/login_page.dart';
-import 'package:kud_shop/src/splash/presentation/splash_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../src/auth/presentation/bloc/auth_bloc.dart';
+import '../../src/auth/presentation/bloc/auth_event.dart';
+import '../../src/auth/presentation/bloc/auth_state.dart';
+import '../../src/auth/presentation/pages/login_page.dart';
+import '../../src/auth/presentation/pages/register_page.dart';
+import '../../src/admin/shell/admin_shell.dart';
+import '../../src/customer/shell/customer_shell.dart';
+import '../../src/splash/presentation/splash_screen.dart';
+import '../injection/injection.dart';
 import 'app_routes.dart';
 
 class AppRouter {
-  static final _analytics = FirebaseAnalytics.instance;
-  static final _observer = FirebaseAnalyticsObserver(analytics: _analytics);
-  static final router = GoRouter(
-    initialLocation: AppRoutes.splash,
-    redirect: _redirect,
-    observers: [_observer],
-    routes: [
-      GoRoute(
-        path: AppRoutes.splash,
-        name: 'splash',
-        builder: (context, state) => const SplashScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.login,
-        name: 'login',
-        builder: (context, state) => const LoginPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.home,
-        name: 'home',
-        builder: (context, state) => const MainPage(),
-      ),
-    ],
-    errorBuilder: (context, state) => Scaffold(
-      body: Center(child: Text('Halaman tidak ditemukan: ${state.error}')),
-    ),
-  );
+  static final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
-  static Future<String?> _redirect(
-    BuildContext context,
-    GoRouterState state,
-  ) async {
-    final storage = sl<FlutterSecureStorage>();
-    final token = await storage.read(key: 'access_token');
+  static GoRouter createRouter() {
+    final authBloc = sl<AuthBloc>()..add(const AuthEvent.started());
 
-    final isLoggedIn = token != null && token.isNotEmpty;
-    final isSplash = state.matchedLocation == AppRoutes.splash;
-    final isLogin = state.matchedLocation == AppRoutes.login;
+    return GoRouter(
+      navigatorKey: _rootNavigatorKey,
+      initialLocation: AppRoutes.splash,
+      refreshListenable: GoRouterRefreshStream(authBloc.stream),
+      redirect: (context, state) {
+        final authState = authBloc.state;
+        final location = state.matchedLocation;
 
-    if (!isLoggedIn && !isLogin) return AppRoutes.login;
-    if (isLoggedIn && (isSplash || isLogin)) return AppRoutes.home;
+        // Masih loading / initial — tampilkan splash
+        if (authState is AuthInitial || authState is AuthLoading) {
+          return location == AppRoutes.splash ? null : AppRoutes.splash;
+        }
 
-    return null;
+        // Belum login
+        if (authState is AuthUnauthenticated) {
+          final isAuthPage =
+              location == AppRoutes.login || location == AppRoutes.register;
+          return isAuthPage ? null : AppRoutes.login;
+        }
+
+        // Sudah login
+        if (authState is AuthAuthenticated ||
+            authState is AuthRegisterSuccess) {
+          final user = authState is AuthAuthenticated
+              ? authState.user
+              : (authState as AuthRegisterSuccess).user;
+
+          // Jangan redirect kalau sudah di halaman yang benar
+          if (user.isAdmin && location.startsWith('/admin')) return null;
+          if (user.isCustomer && location.startsWith('/customer')) return null;
+
+          // Redirect berdasarkan role
+          return user.isAdmin ? AppRoutes.adminHome : AppRoutes.customerHome;
+        }
+
+        return null;
+      },
+      routes: [
+        GoRoute(
+          path: AppRoutes.splash,
+          builder: (_, __) => const SplashScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.login,
+          builder: (_, __) =>
+              BlocProvider.value(value: authBloc, child: const LoginPage()),
+        ),
+        GoRoute(
+          path: AppRoutes.register,
+          builder: (_, __) =>
+              BlocProvider.value(value: authBloc, child: const RegisterPage()),
+        ),
+
+        // ─── Admin Shell ─────────────────────────────────────
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navigationShell) => BlocProvider.value(
+            value: authBloc,
+            child: AdminShell(navigationShell: navigationShell),
+          ),
+          branches: [
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.adminHome,
+                  builder: (_, __) => const AdminDashboardPlaceholder(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.adminOrder,
+                  builder: (_, __) => const AdminOrderPlaceholder(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.adminProduct,
+                  builder: (_, __) => const AdminProductPlaceholder(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.adminProfile,
+                  builder: (_, __) => const AdminProfilePlaceholder(),
+                ),
+              ],
+            ),
+          ],
+        ),
+
+        // ─── Customer Shell ───────────────────────────────────
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navigationShell) => BlocProvider.value(
+            value: authBloc,
+            child: CustomerShell(navigationShell: navigationShell),
+          ),
+          branches: [
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.customerHome,
+                  builder: (_, __) => const CustomerDashboardPlaceholder(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.customerProduct,
+                  builder: (_, __) => const CustomerProductPlaceholder(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.customerCart,
+                  builder: (_, __) => const CustomerCartPlaceholder(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.customerCheckout,
+                  builder: (_, __) => const CustomerCheckoutPlaceholder(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.customerProfile,
+                  builder: (_, __) => const CustomerProfilePlaceholder(),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Placeholder Pages ────────────────────────────────────────
+// Nanti diganti dengan halaman asli
+
+class AdminDashboardPlaceholder extends StatelessWidget {
+  const AdminDashboardPlaceholder({super.key});
+  @override
+  Widget build(BuildContext context) =>
+      const Scaffold(body: Center(child: Text('Admin Dashboard')));
+}
+
+class AdminOrderPlaceholder extends StatelessWidget {
+  const AdminOrderPlaceholder({super.key});
+  @override
+  Widget build(BuildContext context) =>
+      const Scaffold(body: Center(child: Text('Admin Order')));
+}
+
+class AdminProductPlaceholder extends StatelessWidget {
+  const AdminProductPlaceholder({super.key});
+  @override
+  Widget build(BuildContext context) =>
+      const Scaffold(body: Center(child: Text('Admin Product')));
+}
+
+class AdminProfilePlaceholder extends StatelessWidget {
+  const AdminProfilePlaceholder({super.key});
+  @override
+  Widget build(BuildContext context) =>
+      const Scaffold(body: Center(child: Text('Admin Profile')));
+}
+
+class CustomerDashboardPlaceholder extends StatelessWidget {
+  const CustomerDashboardPlaceholder({super.key});
+  @override
+  Widget build(BuildContext context) =>
+      const Scaffold(body: Center(child: Text('Customer Dashboard')));
+}
+
+class CustomerProductPlaceholder extends StatelessWidget {
+  const CustomerProductPlaceholder({super.key});
+  @override
+  Widget build(BuildContext context) =>
+      const Scaffold(body: Center(child: Text('Customer Product')));
+}
+
+class CustomerCartPlaceholder extends StatelessWidget {
+  const CustomerCartPlaceholder({super.key});
+  @override
+  Widget build(BuildContext context) =>
+      const Scaffold(body: Center(child: Text('Customer Cart')));
+}
+
+class CustomerCheckoutPlaceholder extends StatelessWidget {
+  const CustomerCheckoutPlaceholder({super.key});
+  @override
+  Widget build(BuildContext context) =>
+      const Scaffold(body: Center(child: Text('Customer Checkout')));
+}
+
+class CustomerProfilePlaceholder extends StatelessWidget {
+  const CustomerProfilePlaceholder({super.key});
+  @override
+  Widget build(BuildContext context) =>
+      const Scaffold(body: Center(child: Text('Customer Profile')));
+}
+
+// ─── GoRouter Refresh Stream ──────────────────────────────────
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    notifyListeners();
+    _subscription = stream.listen((_) => notifyListeners());
+  }
+
+  late final dynamic _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 }

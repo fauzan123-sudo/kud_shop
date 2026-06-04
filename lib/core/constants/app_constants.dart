@@ -5,5 +5,5 @@ class AppConstants {
   static const int    tokenExpiry   = 1; // menit
   static const int    connectTimeout = 15; // detik
   static const int    receiveTimeout = 15; // detik
-  static const int    employeeLimit  = 20;
+  static const int    userLimit  = 20;
 }
