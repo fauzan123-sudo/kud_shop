@@ -11,9 +11,6 @@ import 'package:kud_shop/src/profile/domain/entities/profile.dart';
 import 'package:kud_shop/src/profile/presentation/bloc/profile_bloc.dart';
 import 'package:kud_shop/src/profile/presentation/bloc/profile_event.dart';
 import 'package:kud_shop/src/profile/presentation/bloc/profile_state.dart';
-import 'package:kud_shop/src/profile/presentation/widget/profile_header.dart';
-import 'package:kud_shop/src/profile/presentation/widget/profile_info_card.dart';
-import 'package:kud_shop/src/profile/presentation/widget/profile_shimmer.dart';
 
 class MockProfileBloc extends MockBloc<ProfileEvent, ProfileState>
     implements ProfileBloc {}

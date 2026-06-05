@@ -56,18 +56,15 @@ class AuthSupabaseDataSourceImpl implements AuthSupabaseDataSource {
       final response = await supabase.auth.signUp(
         email: email,
         password: password,
+        data: {'name': name}, // ← kirim name untuk trigger
       );
 
       if (response.user == null) {
         throw ServerException(message: 'Registrasi gagal, silakan coba lagi');
       }
 
-      // Insert ke tabel profiles
-      await supabase.from('profiles').insert({
-        'id': response.user!.id,
-        'name': name,
-        'role': 'customer',
-      });
+      // Tunggu trigger selesai, lalu fetch profil
+      await Future.delayed(const Duration(milliseconds: 500));
 
       return _fetchProfile(response.user!.id, email);
     } on AuthException catch (e) {

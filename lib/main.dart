@@ -8,6 +8,7 @@ import 'core/config/app_config.dart';
 import 'core/navigation/app_router.dart';
 
 Future<void> main() async {
+ 
   await AppBootstrap.init();
   runApp(const MyApp());
 }

@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kud_shop/core/error/failure.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:kud_shop/core/error/failure.dart';
 import 'package:kud_shop/src/auth/domain/usecases/login.dart';
 
 import '../../../../helpers/mock_helper.dart';
@@ -17,40 +17,55 @@ void main() {
   });
 
   const tParams = LoginParams(
-    username: 'emilys',
-    password: 'emilyspass',
+    email: 'fauzan@gmail.com',
+    password: 'password123',
   );
 
-  test('harus mengembalikan AuthToken saat login berhasil', () async {
-    // arrange
-    when(() => mockRepository.login(
-          username: tParams.username,
-          password: tParams.password,
-        )).thenAnswer((_) async => const Right(tAuthToken));
+  test('harus mengembalikan UserEntity saat login berhasil', () async {
+    when(
+      () => mockRepository.login(
+        email: tParams.email,
+        password: tParams.password,
+      ),
+    ).thenAnswer((_) async => const Right(tUser));
 
-    // act
     final result = await useCase(tParams);
 
-    // assert
-    expect(result, const Right(tAuthToken));
-    verify(() => mockRepository.login(
-          username: tParams.username,
-          password: tParams.password,
-        )).called(1);
+    expect(result, const Right(tUser));
+    verify(
+      () => mockRepository.login(
+        email: tParams.email,
+        password: tParams.password,
+      ),
+    ).called(1);
     verifyNoMoreInteractions(mockRepository);
   });
 
-  test('harus mengembalikan Failure saat login gagal', () async {
-    // arrange
-    when(() => mockRepository.login(
-          username: tParams.username,
-          password: tParams.password,
-        )).thenAnswer((_) async => const Left(ServerFailure('Invalid credentials')));
+  test('harus mengembalikan ServerFailure saat kredensial salah', () async {
+    when(
+      () => mockRepository.login(
+        email: tParams.email,
+        password: tParams.password,
+      ),
+    ).thenAnswer(
+      (_) async => const Left(ServerFailure('Invalid login credentials')),
+    );
 
-    // act
     final result = await useCase(tParams);
 
-    // assert
-    expect(result, const Left(ServerFailure('Invalid credentials')));
+    expect(result, const Left(ServerFailure('Invalid login credentials')));
+  });
+
+  test('harus mengembalikan NetworkFailure saat tidak ada koneksi', () async {
+    when(
+      () => mockRepository.login(
+        email: tParams.email,
+        password: tParams.password,
+      ),
+    ).thenAnswer((_) async => const Left(NetworkFailure()));
+
+    final result = await useCase(tParams);
+
+    expect(result, const Left(NetworkFailure()));
   });
 }
