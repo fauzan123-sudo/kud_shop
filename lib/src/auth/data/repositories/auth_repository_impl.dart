@@ -1,14 +1,13 @@
 import 'package:dartz/dartz.dart';
+import 'package:kud_shop/core/error/error_handler.dart';
+import 'package:kud_shop/core/error/failure.dart';
 import 'package:kud_shop/src/auth/data/models/user_model.dart';
-import '../../../../core/error/error_handler.dart';
-import '../../../../core/error/failure.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_supabase_datasource.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthSupabaseDataSource dataSource;
-
   AuthRepositoryImpl({required this.dataSource});
 
   @override

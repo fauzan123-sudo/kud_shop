@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kud_shop/core/injection/injection.dart';
+import '../../../../component/themes/app_text_style.dart';
+import '../../../../component/widgets/button/app_button.dart';
+import '../../../../component/widgets/textfiled/app_email_field.dart';
+import '../../../../component/widgets/textfiled/app_password_field.dart';
+import '../../../../component/widgets/textfiled/app_text_field.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -19,8 +23,6 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
@@ -45,36 +47,42 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<AuthBloc>(),
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: BlocListener<AuthBloc, AuthState>(
-          listener: (context, state) {
-            if (state is AuthError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                  duration: const Duration(seconds: 4),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listenWhen: (previous, current) =>
+            current is AuthError || current is AuthRegisterSuccess,
+        buildWhen: (previous, current) => true,
+        listener: (context, state) {
+          if (state is AuthError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  state.message,
+                  style: AppTextStyle.bodyMedium.copyWith(color: Colors.white),
                 ),
-              );
-            }
-            if (state is AuthRegisterSuccess) {
-              // Tampilkan pesan sukses lalu kembali ke login
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Registrasi berhasil! Silakan cek email untuk verifikasi.',
-                  ),
-                  backgroundColor: Colors.green,
-                  duration: Duration(seconds: 4),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 4),
+              ),
+            );
+          }
+          if (state is AuthRegisterSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Registrasi berhasil! Silakan login.',
+                  style: AppTextStyle.bodyMedium.copyWith(color: Colors.white),
                 ),
-              );
-              context.pop(); // kembali ke halaman login
-            }
-          },
-          child: SafeArea(
+                backgroundColor: Colors.green,
+                duration: const Duration(seconds: 4),
+              ),
+            );
+            context.pop();
+          }
+        },
+        builder: (context, state) {
+          final isLoading = state is AuthLoading;
+          return SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Form(
@@ -84,7 +92,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: [
                     const SizedBox(height: 48),
 
-                    // ─── Back Button ─────────────────────────
+                    // ─── Back Button ──────────────────────────
                     GestureDetector(
                       onTap: () => context.pop(),
                       child: Container(
@@ -99,35 +107,19 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     const SizedBox(height: 24),
 
-                    // ─── Header ──────────────────────────────
-                    const Text(
-                      'Buat Akun',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
+                    // ─── Header ───────────────────────────────
+                    const Text('Buat Akun', style: AppTextStyle.h1),
                     const SizedBox(height: 8),
-                    Text(
-                      'Daftar untuk mulai berbelanja',
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
+                    Text('Daftar untuk mulai berbelanja', style: AppTextStyle.hint),
                     const SizedBox(height: 32),
 
-                    // ─── Nama ────────────────────────────────
-                    _buildLabel('Nama Lengkap'),
-                    const SizedBox(height: 8),
-                    TextFormField(
+                    // ─── Nama ─────────────────────────────────
+                    AppTextField(
                       controller: _nameController,
+                      label: 'Nama Lengkap',
+                      hint: 'Masukkan nama lengkap',
+                      prefixIcon: Icons.person_outline,
                       textCapitalization: TextCapitalization.words,
-                      decoration: _inputDecoration(
-                        hint: 'Masukkan nama lengkap',
-                        icon: Icons.person_outline,
-                      ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Nama wajib diisi';
@@ -140,153 +132,46 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    // ─── Email ───────────────────────────────
-                    _buildLabel('Email'),
-                    const SizedBox(height: 8),
-                    TextFormField(
+                    // ─── Email ────────────────────────────────
+                    AppEmailField(
                       controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: _inputDecoration(
-                        hint: 'contoh@gmail.com',
-                        icon: Icons.email_outlined,
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Email wajib diisi';
-                        }
-                        if (!value.contains('@') || !value.contains('.')) {
-                          return 'Format email tidak valid';
-                        }
-                        return null;
-                      },
+                      label: 'Email',
                     ),
                     const SizedBox(height: 16),
 
-                    // ─── Password ────────────────────────────
-                    _buildLabel('Password'),
-                    const SizedBox(height: 8),
-                    TextFormField(
+                    // ─── Password ─────────────────────────────
+                    AppPasswordField(
                       controller: _passwordController,
-                      obscureText: _obscurePassword,
-                      decoration:
-                          _inputDecoration(
-                            hint: 'Minimal 8 karakter',
-                            icon: Icons.lock_outline,
-                          ).copyWith(
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                              ),
-                              onPressed: () => setState(
-                                () => _obscurePassword = !_obscurePassword,
-                              ),
-                            ),
-                          ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Password wajib diisi';
-                        }
-                        if (value.length < 8) {
-                          return 'Password minimal 8 karakter';
-                        }
-                        return null;
-                      },
+                      label: 'Password',
+                      hint: 'Minimal 8 karakter',
                     ),
                     const SizedBox(height: 16),
 
-                    // ─── Konfirmasi Password ─────────────────
-                    _buildLabel('Konfirmasi Password'),
-                    const SizedBox(height: 8),
-                    TextFormField(
+                    // ─── Konfirmasi Password ──────────────────
+                    AppPasswordField(
                       controller: _confirmPasswordController,
-                      obscureText: _obscureConfirmPassword,
-                      decoration:
-                          _inputDecoration(
-                            hint: 'Ulangi password',
-                            icon: Icons.lock_outline,
-                          ).copyWith(
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscureConfirmPassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                              ),
-                              onPressed: () => setState(
-                                () => _obscureConfirmPassword =
-                                    !_obscureConfirmPassword,
-                              ),
-                            ),
-                          ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Konfirmasi password wajib diisi';
-                        }
-                        if (value != _passwordController.text) {
-                          return 'Password tidak cocok';
-                        }
-                        return null;
-                      },
+                      label: 'Konfirmasi Password',
+                      hint: 'Ulangi password',
+                      matchController: _passwordController,
                     ),
                     const SizedBox(height: 32),
 
-                    // ─── Register Button ─────────────────────
-                    BlocBuilder<AuthBloc, AuthState>(
-                      builder: (context, state) {
-                        final isLoading = state is AuthLoading;
-                        return SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: ElevatedButton(
-                            onPressed: isLoading ? null : _onRegister,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue.shade600,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 0,
-                            ),
-                            child: isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : const Text(
-                                    'Daftar',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                          ),
-                        );
-                      },
+                    // ─── Tombol Daftar ────────────────────────
+                    AppButton(
+                      label: 'Daftar',
+                      isLoading: isLoading,
+                      onPressed: _onRegister,
                     ),
                     const SizedBox(height: 24),
 
-                    // ─── Login Link ──────────────────────────
+                    // ─── Login Link ───────────────────────────
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          'Sudah punya akun? ',
-                          style: TextStyle(color: Colors.grey.shade600),
-                        ),
+                        Text('Sudah punya akun? ', style: AppTextStyle.hint),
                         GestureDetector(
                           onTap: () => context.pop(),
-                          child: Text(
-                            'Masuk',
-                            style: TextStyle(
-                              color: Colors.blue.shade600,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                          child: Text('Masuk', style: AppTextStyle.link(context)),
                         ),
                       ],
                     ),
@@ -295,42 +180,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLabel(String text) {
-    return Text(
-      text,
-      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-    );
-  }
-
-  InputDecoration _inputDecoration({
-    required String hint,
-    required IconData icon,
-  }) {
-    return InputDecoration(
-      hintText: hint,
-      prefixIcon: Icon(icon),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey.shade300),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.blue.shade600, width: 2),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Colors.red),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Colors.red, width: 2),
+          );
+        },
       ),
     );
   }

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kud_shop/src/admin/category/presentation/pages/category_page.dart';
+import 'package:kud_shop/src/admin/product/domain/entities/product_entity.dart';
+import 'package:kud_shop/src/admin/product/presentation/bloc/product_bloc.dart';
+import 'package:kud_shop/src/admin/product/presentation/pages/admin_product_page.dart';
+import 'package:kud_shop/src/admin/product/presentation/pages/product_form_page.dart';
 import '../../src/auth/presentation/bloc/auth_bloc.dart';
 import '../../src/auth/presentation/bloc/auth_event.dart';
 import '../../src/auth/presentation/bloc/auth_state.dart';
@@ -32,7 +37,7 @@ class AppRouter {
         }
 
         // Belum login
-        if (authState is AuthUnauthenticated) {
+        if (authState is AuthUnauthenticated || authState is AuthError) {
           final isAuthPage =
               location == AppRoutes.login || location == AppRoutes.register;
           return isAuthPage ? null : AppRoutes.login;
@@ -45,11 +50,9 @@ class AppRouter {
               ? authState.user
               : (authState as AuthRegisterSuccess).user;
 
-          // Jangan redirect kalau sudah di halaman yang benar
           if (user.isAdmin && location.startsWith('/admin')) return null;
           if (user.isCustomer && location.startsWith('/customer')) return null;
 
-          // Redirect berdasarkan role
           return user.isAdmin ? AppRoutes.adminHome : AppRoutes.customerHome;
         }
 
@@ -71,13 +74,14 @@ class AppRouter {
               BlocProvider.value(value: authBloc, child: const RegisterPage()),
         ),
 
-        // ─── Admin Shell ─────────────────────────────────────
+        // ─── Admin Shell ──────────────────────────────────────
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) => BlocProvider.value(
             value: authBloc,
             child: AdminShell(navigationShell: navigationShell),
           ),
           branches: [
+            // Dashboard
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -86,6 +90,7 @@ class AppRouter {
                 ),
               ],
             ),
+            // Order
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -94,14 +99,38 @@ class AppRouter {
                 ),
               ],
             ),
+            // Product + Category
             StatefulShellBranch(
               routes: [
                 GoRoute(
                   path: AppRoutes.adminProduct,
-                  builder: (_, __) => const AdminProductPlaceholder(),
+                  builder: (_, __) => const AdminProductPage(),
+                  routes: [
+                    GoRoute(
+                      path: 'category',
+                      builder: (_, __) => const CategoryPage(),
+                    ),
+                    GoRoute(
+                      path: 'add',
+                      builder: (_, __) => BlocProvider.value(
+                        value: sl<ProductBloc>(),
+                        child: const ProductFormPage(),
+                      ),
+                    ),
+                    GoRoute(
+                      path: 'edit',
+                      builder: (context, state) => BlocProvider.value(
+                        value: sl<ProductBloc>(),
+                        child: ProductFormPage(
+                          product: state.extra as ProductEntity?,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
+            // Profile
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -120,6 +149,7 @@ class AppRouter {
             child: CustomerShell(navigationShell: navigationShell),
           ),
           branches: [
+            // Home
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -128,6 +158,7 @@ class AppRouter {
                 ),
               ],
             ),
+            // Product
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -136,6 +167,7 @@ class AppRouter {
                 ),
               ],
             ),
+            // Cart
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -144,6 +176,7 @@ class AppRouter {
                 ),
               ],
             ),
+            // Checkout
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -152,6 +185,7 @@ class AppRouter {
                 ),
               ],
             ),
+            // Profile
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -168,8 +202,6 @@ class AppRouter {
 }
 
 // ─── Placeholder Pages ────────────────────────────────────────
-// Nanti diganti dengan halaman asli
-
 class AdminDashboardPlaceholder extends StatelessWidget {
   const AdminDashboardPlaceholder({super.key});
   @override
@@ -182,13 +214,6 @@ class AdminOrderPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       const Scaffold(body: Center(child: Text('Admin Order')));
-}
-
-class AdminProductPlaceholder extends StatelessWidget {
-  const AdminProductPlaceholder({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: Text('Admin Product')));
 }
 
 class AdminProfilePlaceholder extends StatelessWidget {

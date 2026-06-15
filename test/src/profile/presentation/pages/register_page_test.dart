@@ -12,15 +12,21 @@ class MockAuthBloc extends MockBloc<AuthEvent, AuthState> implements AuthBloc {}
 void main() {
   late MockAuthBloc mockAuthBloc;
 
+  setUpAll(() {
+    registerFallbackValue(
+      const AuthEvent.register(name: '', email: '', password: ''),
+    );
+  });
+
   setUp(() {
     mockAuthBloc = MockAuthBloc();
     when(() => mockAuthBloc.state).thenReturn(const AuthState.initial());
   });
 
-  tearDown(() => mockAuthBloc.close());
+  tearDown(() async {
+    await mockAuthBloc.close();
+  });
 
-  // Helper: wrap RegisterPage dengan BlocProvider mock
-  // (menggantikan BlocProvider(create: (_) => sl<AuthBloc>()) di dalam page)
   Widget buildWidget() {
     return MaterialApp(
       home: BlocProvider<AuthBloc>.value(
@@ -69,14 +75,12 @@ void main() {
     testWidgets('tombol Daftar harus disabled saat loading', (tester) async {
       when(() => mockAuthBloc.state).thenReturn(const AuthState.loading());
       await tester.pumpWidget(buildWidget());
-
       final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
       expect(button.onPressed, isNull);
     });
 
     testWidgets('tombol Daftar harus enabled saat initial', (tester) async {
       await tester.pumpWidget(buildWidget());
-
       final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
       expect(button.onPressed, isNotNull);
     });
@@ -85,65 +89,49 @@ void main() {
   group('RegisterPage Validasi Form', () {
     testWidgets('harus tampil error saat form dikosongkan', (tester) async {
       await tester.pumpWidget(buildWidget());
-
       await tester.tap(find.text('Daftar'));
       await tester.pump();
-
       expect(find.text('Nama wajib diisi'), findsOneWidget);
       expect(find.text('Email wajib diisi'), findsOneWidget);
       expect(find.text('Password wajib diisi'), findsOneWidget);
       expect(find.text('Konfirmasi password wajib diisi'), findsOneWidget);
     });
 
-    testWidgets('harus tampil error saat nama kurang dari 3 karakter', (
-      tester,
-    ) async {
+    testWidgets('harus tampil error saat nama kurang dari 3 karakter',
+        (tester) async {
       await tester.pumpWidget(buildWidget());
-
       await tester.enterText(find.byType(TextFormField).at(0), 'ab');
       await tester.tap(find.text('Daftar'));
       await tester.pump();
-
       expect(find.text('Nama minimal 3 karakter'), findsOneWidget);
     });
 
-    testWidgets('harus tampil error saat format email tidak valid', (
-      tester,
-    ) async {
+    testWidgets('harus tampil error saat format email tidak valid',
+        (tester) async {
       await tester.pumpWidget(buildWidget());
-
       await tester.enterText(
-        find.byType(TextFormField).at(1),
-        'emailtidakvalid',
-      );
+          find.byType(TextFormField).at(1), 'emailtidakvalid');
       await tester.tap(find.text('Daftar'));
       await tester.pump();
-
       expect(find.text('Format email tidak valid'), findsOneWidget);
     });
 
-    testWidgets('harus tampil error saat password kurang dari 8 karakter', (
-      tester,
-    ) async {
+    testWidgets('harus tampil error saat password kurang dari 8 karakter',
+        (tester) async {
       await tester.pumpWidget(buildWidget());
-
       await tester.enterText(find.byType(TextFormField).at(2), '1234567');
       await tester.tap(find.text('Daftar'));
       await tester.pump();
-
       expect(find.text('Password minimal 8 karakter'), findsOneWidget);
     });
 
-    testWidgets('harus tampil error saat konfirmasi password tidak cocok', (
-      tester,
-    ) async {
+    testWidgets('harus tampil error saat konfirmasi password tidak cocok',
+        (tester) async {
       await tester.pumpWidget(buildWidget());
-
       await tester.enterText(find.byType(TextFormField).at(2), 'password123');
       await tester.enterText(find.byType(TextFormField).at(3), 'password456');
       await tester.tap(find.text('Daftar'));
       await tester.pump();
-
       expect(find.text('Password tidak cocok'), findsOneWidget);
     });
   });
@@ -151,15 +139,11 @@ void main() {
   group('RegisterPage BLoC Interaction', () {
     testWidgets('harus dispatch RegisterEvent saat form valid', (tester) async {
       await tester.pumpWidget(buildWidget());
-
       await tester.enterText(find.byType(TextFormField).at(0), 'Ahmad Fauzan');
       await tester.enterText(
-        find.byType(TextFormField).at(1),
-        'fauzan@gmail.com',
-      );
+          find.byType(TextFormField).at(1), 'fauzan@gmail.com');
       await tester.enterText(find.byType(TextFormField).at(2), 'password123');
       await tester.enterText(find.byType(TextFormField).at(3), 'password123');
-
       await tester.tap(find.text('Daftar'));
       await tester.pump();
 
@@ -192,12 +176,20 @@ void main() {
 
       expect(find.text('User already registered'), findsOneWidget);
     });
+
+    testWidgets('tidak harus dispatch RegisterEvent saat form tidak valid',
+        (tester) async {
+      await tester.pumpWidget(buildWidget());
+      // form kosong langsung tap Daftar
+      await tester.tap(find.text('Daftar'));
+      await tester.pump();
+
+      verifyNever(() => mockAuthBloc.add(any()));
+    });
   });
 }
 
-// ─── Wrapper agar BlocProvider internal di RegisterPage tidak bentrok ───────
-// RegisterPage punya BlocProvider(create: (_) => sl<AuthBloc>()) di dalamnya.
-// Untuk test, kita bypass dengan render konten inner-nya langsung.
+// ─── Wrapper ──────────────────────────────────────────────────────────────────
 class _RegisterPageTestWrapper extends StatefulWidget {
   const _RegisterPageTestWrapper();
 
@@ -260,7 +252,10 @@ class _RegisterPageTestWrapperState extends State<_RegisterPageTestWrapper> {
                   const SizedBox(height: 24),
                   const Text(
                     'Buat Akun',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   const Text('Nama Lengkap'),
@@ -347,7 +342,10 @@ class _RegisterPageTestWrapperState extends State<_RegisterPageTestWrapper> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text('Sudah punya akun? '),
-                      GestureDetector(onTap: () {}, child: const Text('Masuk')),
+                      GestureDetector(
+                        onTap: () {},
+                        child: const Text('Masuk'),
+                      ),
                     ],
                   ),
                 ],
