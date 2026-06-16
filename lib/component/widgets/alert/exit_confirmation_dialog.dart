@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class ExitConfirmationDialog extends StatelessWidget {
   const ExitConfirmationDialog({super.key});
 
-  // ← static method agar mudah dipanggil
   static Future<bool?> show(BuildContext context) {
     return showDialog<bool>(
       context: context,

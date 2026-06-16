@@ -22,7 +22,7 @@ class ProductCategoryDropdown extends StatelessWidget {
         const Text('Kategori', style: AppTextStyle.label),
         const SizedBox(height: 8),
         DropdownButtonFormField<CategoryEntity>(
-          value: selectedCategory,
+          initialValue: selectedCategory,
           decoration: InputDecoration(
             hintText: 'Pilih kategori obat',
             prefixIcon: const Icon(Icons.category_outlined),

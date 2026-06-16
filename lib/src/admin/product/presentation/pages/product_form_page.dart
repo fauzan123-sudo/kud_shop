@@ -119,6 +119,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
     if (!_formKey.currentState!.validate()) return;
 
     final imageUrl = await _uploadImage();
+    if (!mounted) return;
     final name = _nameController.text.trim();
     final price =
         double.tryParse(_priceController.text.trim().replaceAll('.', '')) ?? 0;

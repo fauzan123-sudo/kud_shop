@@ -14,6 +14,7 @@ class AppRoutes {
   static const String adminProfile = '/admin/profile';
   static const String adminCategory = '/admin/product/category';
   static const String adminProductDetail = '/admin/product/detail';
+   static const String adminProfileEdit = '/admin/profile/edit';
 
   // Customer
   static const String customerHome = '/customer';
@@ -21,4 +22,5 @@ class AppRoutes {
   static const String customerCart = '/customer/cart';
   static const String customerCheckout = '/customer/checkout';
   static const String customerProfile = '/customer/profile';
+  static const String customerProfileEdit = '/customer/profile/edit';
 }

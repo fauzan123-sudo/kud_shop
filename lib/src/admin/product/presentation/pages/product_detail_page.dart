@@ -179,7 +179,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Deskripsi', style: AppTextStyle.label),
+          const Text('Deskripsi', style: AppTextStyle.label),
           const SizedBox(height: 8),
           Text(
             product.description!,
