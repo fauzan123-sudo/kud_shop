@@ -13,6 +13,7 @@ class AppRoutes {
   static const String adminProductEdit = '/admin/product/edit';
   static const String adminProfile = '/admin/profile';
   static const String adminCategory = '/admin/product/category';
+  static const String adminProductDetail = '/admin/product/detail';
 
   // Customer
   static const String customerHome = '/customer';

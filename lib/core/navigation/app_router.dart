@@ -5,7 +5,9 @@ import 'package:kud_shop/src/admin/category/presentation/pages/category_page.dar
 import 'package:kud_shop/src/admin/product/domain/entities/product_entity.dart';
 import 'package:kud_shop/src/admin/product/presentation/bloc/product_bloc.dart';
 import 'package:kud_shop/src/admin/product/presentation/pages/admin_product_page.dart';
+import 'package:kud_shop/src/admin/product/presentation/pages/product_detail_page.dart';
 import 'package:kud_shop/src/admin/product/presentation/pages/product_form_page.dart';
+import 'package:kud_shop/src/profile/presentation/pages/profile_page.dart';
 import '../../src/auth/presentation/bloc/auth_bloc.dart';
 import '../../src/auth/presentation/bloc/auth_event.dart';
 import '../../src/auth/presentation/bloc/auth_state.dart';
@@ -31,19 +33,16 @@ class AppRouter {
         final authState = authBloc.state;
         final location = state.matchedLocation;
 
-        // Masih loading / initial — tampilkan splash
         if (authState is AuthInitial || authState is AuthLoading) {
           return location == AppRoutes.splash ? null : AppRoutes.splash;
         }
 
-        // Belum login
         if (authState is AuthUnauthenticated || authState is AuthError) {
           final isAuthPage =
               location == AppRoutes.login || location == AppRoutes.register;
           return isAuthPage ? null : AppRoutes.login;
         }
 
-        // Sudah login
         if (authState is AuthAuthenticated ||
             authState is AuthRegisterSuccess) {
           final user = authState is AuthAuthenticated
@@ -59,6 +58,7 @@ class AppRouter {
         return null;
       },
       routes: [
+        // ─── Auth & Splash ────────────────────────────────────
         GoRoute(
           path: AppRoutes.splash,
           builder: (_, __) => const SplashScreen(),
@@ -74,7 +74,32 @@ class AppRouter {
               BlocProvider.value(value: authBloc, child: const RegisterPage()),
         ),
 
-        // ─── Admin Shell ──────────────────────────────────────
+        // ─── Halaman tanpa bottom nav (di luar Shell) ─────────
+        GoRoute(
+          path: AppRoutes.adminCategory,
+          builder: (_, __) => const CategoryPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.adminProductAdd,
+          builder: (_, __) => BlocProvider(
+            create: (_) => sl<ProductBloc>(),
+            child: const ProductFormPage(),
+          ),
+        ),
+        GoRoute(
+          path: AppRoutes.adminProductEdit,
+          builder: (context, state) => BlocProvider(
+            create: (_) => sl<ProductBloc>(),
+            child: ProductFormPage(product: state.extra as ProductEntity?),
+          ),
+        ),
+        GoRoute(
+          path: AppRoutes.adminProductDetail,
+          builder: (context, state) =>
+              ProductDetailPage(product: state.extra as ProductEntity),
+        ),
+
+        // ─── Admin Shell (dengan bottom nav) ──────────────────
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) => BlocProvider.value(
             value: authBloc,
@@ -99,34 +124,12 @@ class AppRouter {
                 ),
               ],
             ),
-            // Product + Category
+            // Product (tanpa sub-route, sudah dipindah ke atas)
             StatefulShellBranch(
               routes: [
                 GoRoute(
                   path: AppRoutes.adminProduct,
                   builder: (_, __) => const AdminProductPage(),
-                  routes: [
-                    GoRoute(
-                      path: 'category',
-                      builder: (_, __) => const CategoryPage(),
-                    ),
-                    GoRoute(
-                      path: 'add',
-                      builder: (_, __) => BlocProvider.value(
-                        value: sl<ProductBloc>(),
-                        child: const ProductFormPage(),
-                      ),
-                    ),
-                    GoRoute(
-                      path: 'edit',
-                      builder: (context, state) => BlocProvider.value(
-                        value: sl<ProductBloc>(),
-                        child: ProductFormPage(
-                          product: state.extra as ProductEntity?,
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
@@ -135,21 +138,23 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: AppRoutes.adminProfile,
-                  builder: (_, __) => const AdminProfilePlaceholder(),
+                  builder: (_, __) => BlocProvider.value(
+                    value: authBloc,
+                    child: const ProfilePage(),
+                  ),
                 ),
               ],
             ),
           ],
         ),
 
-        // ─── Customer Shell ───────────────────────────────────
+        // ─── Customer Shell (dengan bottom nav) ───────────────
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) => BlocProvider.value(
             value: authBloc,
             child: CustomerShell(navigationShell: navigationShell),
           ),
           branches: [
-            // Home
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -158,7 +163,6 @@ class AppRouter {
                 ),
               ],
             ),
-            // Product
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -167,7 +171,6 @@ class AppRouter {
                 ),
               ],
             ),
-            // Cart
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -176,7 +179,6 @@ class AppRouter {
                 ),
               ],
             ),
-            // Checkout
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -185,12 +187,14 @@ class AppRouter {
                 ),
               ],
             ),
-            // Profile
             StatefulShellBranch(
               routes: [
                 GoRoute(
                   path: AppRoutes.customerProfile,
-                  builder: (_, __) => const CustomerProfilePlaceholder(),
+                  builder: (_, __) => BlocProvider.value(
+                    value: authBloc,
+                    child: const ProfilePage(),
+                  ),
                 ),
               ],
             ),

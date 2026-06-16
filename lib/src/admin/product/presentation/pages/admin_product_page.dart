@@ -32,20 +32,11 @@ class _ProductView extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: const Text('Kelola Produk'),
+        title: const Text('Kelola Obat'),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
-        actions: [
-          // ─── Tombol Kelola Kategori ──────────────────
-          TextButton.icon(
-            onPressed: () => context.push(AppRoutes.adminCategory),
-            icon: const Icon(Icons.category_outlined, size: 18),
-            label: const Text('Kategori'),
-          ),
-        ],
       ),
-      // ─── FAB Tambah Produk ───────────────────────────
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push(AppRoutes.adminProductAdd),
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -84,7 +75,6 @@ class _ProductView extends StatelessWidget {
             itemBuilder: (context, index) {
               return ProductCard(
                 product: products[index],
-                // ─── Navigasi ke halaman edit ──────────
                 onEdit: () => context.push(
                   AppRoutes.adminProductEdit,
                   extra: products[index],
@@ -109,14 +99,14 @@ class _ProductView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Belum ada produk',
+            'Belum ada obat',
             style: AppTextStyle.bodyMedium.copyWith(
               color: Colors.grey.shade600,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Tap + untuk menambah produk',
+            'Tap + untuk menambah obat',
             style: AppTextStyle.bodySmall.copyWith(color: Colors.grey.shade400),
           ),
         ],

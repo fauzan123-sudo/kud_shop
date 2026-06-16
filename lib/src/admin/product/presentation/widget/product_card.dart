@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kud_shop/component/themes/app_text_style.dart';
+import 'package:kud_shop/core/navigation/app_routes.dart';
 import 'package:kud_shop/src/admin/product/domain/entities/product_entity.dart';
 import 'package:kud_shop/src/admin/product/presentation/bloc/product_bloc.dart';
 import 'package:kud_shop/src/admin/product/presentation/bloc/product_event.dart';
@@ -13,96 +15,103 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(10),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+    return InkWell(
+      onTap: () => context.push(
+        AppRoutes.adminProductDetail,
+        extra: product,
       ),
-      child: Row(
-        children: [
-          // ─── Gambar Produk ──────────────────────────
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(12),
-              bottomLeft: Radius.circular(12),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(10),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-            child: product.imageUrl != null
-                ? Image.network(
-                    product.imageUrl!,
-                    width: 90,
-                    height: 90,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => _buildImagePlaceholder(),
-                  )
-                : _buildImagePlaceholder(),
-          ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // ─── Gambar Produk ──────────────────────────
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                bottomLeft: Radius.circular(12),
+              ),
+              child: product.imageUrl != null
+                  ? Image.network(
+                      product.imageUrl!,
+                      width: 90,
+                      height: 90,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => _buildImagePlaceholder(),
+                    )
+                  : _buildImagePlaceholder(),
+            ),
 
-          // ─── Info Produk ────────────────────────────
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Nama produk
-                  Text(
-                    product.name,
-                    style: AppTextStyle.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-
-                  // Harga
-                  Text(
-                    'Rp ${_formatPrice(product.price)}',
-                    style: AppTextStyle.bodyMedium.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w600,
+            // ─── Info Produk ────────────────────────────
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Nama produk
+                    Text(
+                      product.name,
+                      style: AppTextStyle.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  const SizedBox(height: 4),
+                    const SizedBox(height: 4),
 
-                  // Stok + status
-                  Row(
-                    children: [
-                      _buildStockBadge(),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${product.stock} ${product.unit}',
-                        style: AppTextStyle.caption,
+                    // Harga
+                    Text(
+                      'Rp ${_formatPrice(product.price)}',
+                      style: AppTextStyle.bodyMedium.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w600,
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 4),
+
+                    // Stok + status
+                    Row(
+                      children: [
+                        _buildStockBadge(),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${product.stock} ${product.unit}',
+                          style: AppTextStyle.caption,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
 
-          // ─── Aksi ───────────────────────────────────
-          Column(
-            children: [
-              IconButton(
-                icon: Icon(
-                  Icons.edit_outlined,
-                  color: Theme.of(context).colorScheme.primary,
+            // ─── Aksi ───────────────────────────────────
+            Column(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.edit_outlined,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  onPressed: onEdit,
                 ),
-                onPressed: onEdit,
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
-                onPressed: () => _showDeleteConfirm(context),
-              ),
-            ],
-          ),
-        ],
+                IconButton(
+                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                  onPressed: () => _showDeleteConfirm(context),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
