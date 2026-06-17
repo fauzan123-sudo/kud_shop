@@ -7,6 +7,7 @@ import 'package:kud_shop/src/admin/product/presentation/bloc/product_bloc.dart';
 import 'package:kud_shop/src/admin/product/presentation/pages/admin_product_page.dart';
 import 'package:kud_shop/src/admin/product/presentation/pages/product_detail_page.dart';
 import 'package:kud_shop/src/admin/product/presentation/pages/product_form_page.dart';
+import 'package:kud_shop/src/profile/presentation/pages/profile_edit_page.dart';
 import 'package:kud_shop/src/profile/presentation/pages/profile_page.dart';
 import '../../src/auth/presentation/bloc/auth_bloc.dart';
 import '../../src/auth/presentation/bloc/auth_event.dart';
@@ -97,6 +98,14 @@ class AppRouter {
           path: AppRoutes.adminProductDetail,
           builder: (context, state) =>
               ProductDetailPage(product: state.extra as ProductEntity),
+        ),
+        GoRoute(
+          path: AppRoutes.adminProfileEdit,
+          builder: (_, __) => const ProfileEditPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.customerProfileEdit,
+          builder: (_, __) => const ProfileEditPage(),
         ),
 
         // ─── Admin Shell (dengan bottom nav) ──────────────────

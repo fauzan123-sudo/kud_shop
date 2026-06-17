@@ -47,13 +47,27 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
-class _ProfileContent extends StatelessWidget {
+class _ProfileContent extends StatefulWidget {
   final UserEntity user;
 
   const _ProfileContent({required this.user});
 
   @override
+  State<_ProfileContent> createState() => _ProfileContentState();
+}
+
+class _ProfileContentState extends State<_ProfileContent> {
+  // ─── Override lokal setelah edit profil ──────────────────
+  // Dipakai supaya tampilan langsung update tanpa perlu
+  // trigger AuthEvent.started() yang memicu redirect ke splash.
+  UserEntity? _localOverride;
+
+  UserEntity get _user => _localOverride ?? widget.user;
+
+  @override
   Widget build(BuildContext context) {
+    final user = _user;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -89,11 +103,16 @@ class _ProfileContent extends StatelessWidget {
             icon: Icons.edit_outlined,
             label: 'Edit Profil',
             color: Colors.blue,
-            onTap: () => context.push(
-              user.isAdmin
-                  ? AppRoutes.adminProfileEdit
-                  : AppRoutes.customerProfileEdit,
-            ),
+            onTap: () async {
+              final updatedUser = await context.push<UserEntity>(
+                user.isAdmin
+                    ? AppRoutes.adminProfileEdit
+                    : AppRoutes.customerProfileEdit,
+              );
+              if (updatedUser != null && context.mounted) {
+                setState(() => _localOverride = updatedUser);
+              }
+            },
           ),
           const SizedBox(height: 8),
           ProfileMenuButton(
