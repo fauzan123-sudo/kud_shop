@@ -7,6 +7,15 @@ import 'package:kud_shop/src/admin/product/presentation/bloc/product_bloc.dart';
 import 'package:kud_shop/src/admin/product/presentation/pages/admin_product_page.dart';
 import 'package:kud_shop/src/admin/product/presentation/pages/product_detail_page.dart';
 import 'package:kud_shop/src/admin/product/presentation/pages/product_form_page.dart';
+import 'package:kud_shop/src/customer/address/presentation/pages/address_list_page.dart';
+import 'package:kud_shop/src/customer/cart/presentation/page/cart_page.dart';
+import 'package:kud_shop/src/customer/dashboard/presentation/pages/dashboard_page_customer.dart';
+import 'package:kud_shop/src/customer/order/domain/entities/order_entity.dart';
+import 'package:kud_shop/src/customer/order/presentation/pages/checkout_page.dart';
+import 'package:kud_shop/src/customer/order/presentation/pages/payment_proof_page.dart';
+import 'package:kud_shop/src/customer/product/presentation/pages/customer_product_page.dart';
+import 'package:kud_shop/src/customer/product_detail/presentation/widget/customer_product_detail_page.dart';
+import 'package:kud_shop/src/profile/presentation/pages/change_password_page.dart';
 import 'package:kud_shop/src/profile/presentation/pages/profile_edit_page.dart';
 import 'package:kud_shop/src/profile/presentation/pages/profile_page.dart';
 import '../../src/auth/presentation/bloc/auth_bloc.dart';
@@ -35,6 +44,10 @@ class AppRouter {
         final location = state.matchedLocation;
 
         if (authState is AuthInitial || authState is AuthLoading) {
+          final isAuthPage =
+              location == AppRoutes.login || location == AppRoutes.register;
+          if (isAuthPage)
+            return null; 
           return location == AppRoutes.splash ? null : AppRoutes.splash;
         }
 
@@ -104,8 +117,38 @@ class AppRouter {
           builder: (_, __) => const ProfileEditPage(),
         ),
         GoRoute(
+          path: AppRoutes.adminChangePassword,
+          builder: (_, __) => const ChangePasswordPage(),
+        ),
+        GoRoute(
           path: AppRoutes.customerProfileEdit,
           builder: (_, __) => const ProfileEditPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.customerAddressList,
+          builder: (_, __) => const AddressListPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.customerChangePassword,
+          builder: (_, __) => const ChangePasswordPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.customerProductDetail,
+          builder: (context, state) =>
+              CustomerProductDetailPage(product: state.extra as ProductEntity),
+        ),
+        GoRoute(
+          path: AppRoutes.customerProduct,
+          builder: (_, __) => const CustomerProductPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.customerCheckout,
+          builder: (_, __) => const CheckoutPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.customerPaymentProof,
+          builder: (context, state) =>
+              PaymentProofPage(order: state.extra as OrderEntity),
         ),
 
         // ─── Admin Shell (dengan bottom nav) ──────────────────
@@ -168,15 +211,7 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: AppRoutes.customerHome,
-                  builder: (_, __) => const CustomerDashboardPlaceholder(),
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: AppRoutes.customerProduct,
-                  builder: (_, __) => const CustomerProductPlaceholder(),
+                  builder: (_, __) => const DashboardPageCustomer(),
                 ),
               ],
             ),
@@ -184,15 +219,7 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: AppRoutes.customerCart,
-                  builder: (_, __) => const CustomerCartPlaceholder(),
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: AppRoutes.customerCheckout,
-                  builder: (_, __) => const CustomerCheckoutPlaceholder(),
+                  builder: (_, __) => const CartPage(),
                 ),
               ],
             ),
@@ -234,41 +261,6 @@ class AdminProfilePlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       const Scaffold(body: Center(child: Text('Admin Profile')));
-}
-
-class CustomerDashboardPlaceholder extends StatelessWidget {
-  const CustomerDashboardPlaceholder({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: Text('Customer Dashboard')));
-}
-
-class CustomerProductPlaceholder extends StatelessWidget {
-  const CustomerProductPlaceholder({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: Text('Customer Product')));
-}
-
-class CustomerCartPlaceholder extends StatelessWidget {
-  const CustomerCartPlaceholder({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: Text('Customer Cart')));
-}
-
-class CustomerCheckoutPlaceholder extends StatelessWidget {
-  const CustomerCheckoutPlaceholder({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: Text('Customer Checkout')));
-}
-
-class CustomerProfilePlaceholder extends StatelessWidget {
-  const CustomerProfilePlaceholder({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: Text('Customer Profile')));
 }
 
 // ─── GoRouter Refresh Stream ──────────────────────────────────

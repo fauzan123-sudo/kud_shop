@@ -47,7 +47,6 @@ class AuthSupabaseDataSourceImpl implements AuthSupabaseDataSource {
         throw ServerException(message: 'Registrasi gagal, silakan coba lagi');
       }
 
-      // ← tidak fetch profile, langsung return dari response
       return UserModel(
         id: response.user!.id,
         email: email,
@@ -84,6 +83,42 @@ class AuthSupabaseDataSourceImpl implements AuthSupabaseDataSource {
     }
   }
 
+  @override
+  Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    final user = supabase.auth.currentUser;
+    if (user == null || user.email == null) {
+      throw UnauthorizedException();
+    }
+
+    // ─── Step 1: verifikasi password lama dengan re-login ───
+    // Supabase tidak punya endpoint "cek password" terpisah,
+    // jadi cara paling aman adalah coba sign-in ulang pakai
+    // email + password lama. Kalau salah, AuthException akan
+    // throw di sini dan diterjemahkan jadi pesan yang jelas.
+    try {
+      await supabase.auth.signInWithPassword(
+        email: user.email!,
+        password: oldPassword,
+      );
+    } on AuthException catch (_) {
+      throw ServerException(message: 'Password lama salah');
+    }
+
+    // ─── Step 2: update ke password baru ───
+    try {
+      await supabase.auth.updateUser(UserAttributes(password: newPassword));
+    } on AuthException catch (e) {
+      throw ServerException(message: _mapAuthError(e.message));
+    } catch (e) {
+      throw ServerException(
+        message: 'Gagal mengubah password, silakan coba lagi',
+      );
+    }
+  }
+
   // ─── Helper ───────────────────────────────────────────────
 
   Future<UserModel> _fetchProfile(String userId, String email) async {
@@ -115,6 +150,9 @@ class AuthSupabaseDataSourceImpl implements AuthSupabaseDataSource {
     }
     if (message.contains('Password should be at least')) {
       return 'Password minimal 8 karakter';
+    }
+    if (message.contains('New password should be different')) {
+      return 'Password baru harus berbeda dari password lama';
     }
     return message;
   }

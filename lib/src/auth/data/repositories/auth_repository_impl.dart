@@ -60,4 +60,20 @@ class AuthRepositoryImpl implements AuthRepository {
       return handleError(e);
     }
   }
+
+  @override
+  Future<Either<Failure, void>> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    try {
+      await dataSource.changePassword(
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+      );
+      return const Right(null);
+    } catch (e) {
+      return handleError(e);
+    }
+  }
 }

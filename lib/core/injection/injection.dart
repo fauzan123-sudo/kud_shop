@@ -11,11 +11,37 @@ import 'package:kud_shop/src/auth/data/datasources/auth_supabase_datasource.dart
 import 'package:kud_shop/src/auth/data/datasources/auth_supabase_datasource_impl.dart';
 import 'package:kud_shop/src/auth/data/repositories/auth_repository_impl.dart';
 import 'package:kud_shop/src/auth/domain/repositories/auth_repository.dart';
+import 'package:kud_shop/src/auth/domain/usecases/change_password.dart';
 import 'package:kud_shop/src/auth/domain/usecases/login.dart';
 import 'package:kud_shop/src/auth/domain/usecases/register.dart';
 import 'package:kud_shop/src/auth/domain/usecases/logout.dart';
 import 'package:kud_shop/src/auth/domain/usecases/get_current_user.dart';
 import 'package:kud_shop/src/auth/presentation/bloc/auth_bloc.dart';
+import 'package:kud_shop/src/customer/address/data/datasources/address_supabase_datasource.dart';
+import 'package:kud_shop/src/customer/address/data/repositories/address_repository_impl.dart';
+import 'package:kud_shop/src/customer/address/domain/repositories/address_repository.dart';
+import 'package:kud_shop/src/customer/address/domain/usecases/create_address.dart';
+import 'package:kud_shop/src/customer/address/domain/usecases/delete_address.dart';
+import 'package:kud_shop/src/customer/address/domain/usecases/get_addresses.dart';
+import 'package:kud_shop/src/customer/address/domain/usecases/set_default_address.dart';
+import 'package:kud_shop/src/customer/address/domain/usecases/update_address.dart';
+import 'package:kud_shop/src/customer/address/presentation/bloc/address_bloc.dart';
+import 'package:kud_shop/src/customer/cart/data/datasources/cart_supabase_datasource.dart';
+import 'package:kud_shop/src/customer/cart/data/repositories/cart_repository_impl.dart';
+import 'package:kud_shop/src/customer/cart/domain/repositories/cart_repository.dart';
+import 'package:kud_shop/src/customer/cart/domain/usecases/add_to_cart.dart';
+import 'package:kud_shop/src/customer/cart/domain/usecases/get_cart_items.dart';
+import 'package:kud_shop/src/customer/cart/domain/usecases/remove_from_cart.dart';
+import 'package:kud_shop/src/customer/cart/domain/usecases/update_cart_quantity.dart';
+import 'package:kud_shop/src/customer/cart/presentation/bloc/cart_bloc.dart';
+import 'package:kud_shop/src/customer/dashboard/presentation/bloc/dashboard_product_bloc.dart';
+import 'package:kud_shop/src/customer/order/data/datasources/order_supabase_datasource.dart';
+import 'package:kud_shop/src/customer/order/data/repositories/order_repository_impl.dart';
+import 'package:kud_shop/src/customer/order/domain/repositories/order_repository.dart';
+import 'package:kud_shop/src/customer/order/domain/usecases/create_order.dart';
+import 'package:kud_shop/src/customer/order/domain/usecases/get_my_orders.dart';
+import 'package:kud_shop/src/customer/order/domain/usecases/upload_payment_proof.dart';
+import 'package:kud_shop/src/customer/product/presentation/bloc/customer_product_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:kud_shop/src/admin/product/data/datasources/product_supabase_datasource.dart';
 import 'package:kud_shop/src/admin/product/data/datasources/product_supabase_datasource_impl.dart';
@@ -45,7 +71,7 @@ void initDependencies() {
   sl.registerLazySingleton(() => Logout(sl()));
   sl.registerLazySingleton(() => GetCurrentUser(sl()));
 
-  sl.registerFactory(
+  sl.registerLazySingleton(
     () => AuthBloc(
       login: sl(),
       register: sl(),
@@ -54,7 +80,7 @@ void initDependencies() {
     ),
   );
 
-   // ─── Category ───────────────────────────────────────────────────────────────
+  // ─── Category ───────────────────────────────────────────────────────────────
   sl.registerLazySingleton<CategorySupabaseDataSource>(
     () => CategorySupabaseDataSourceImpl(sl()),
   );
@@ -62,7 +88,7 @@ void initDependencies() {
     () => CategoryRepositoryImpl(dataSource: sl()),
   );
   sl.registerLazySingleton(() => GetCategories(sl()));
-  
+
   sl.registerLazySingleton(() => CreateCategory(sl()));
   sl.registerLazySingleton(() => UpdateCategory(sl()));
   sl.registerLazySingleton(() => DeleteCategory(sl()));
@@ -95,4 +121,65 @@ void initDependencies() {
     ),
   );
 
+  // ─── Cart ─────────────────────────────────────────────────────────────────
+  sl.registerLazySingleton<CartSupabaseDataSource>(
+    () => CartSupabaseDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<CartRepository>(
+    () => CartRepositoryImpl(dataSource: sl()),
+  );
+  sl.registerLazySingleton(() => GetCartItems(sl()));
+  sl.registerLazySingleton(() => AddToCart(sl()));
+  sl.registerLazySingleton(() => UpdateCartQuantity(sl()));
+  sl.registerLazySingleton(() => RemoveFromCart(sl()));
+  sl.registerFactory(
+    () => CartBloc(
+      getCartItems: sl(),
+      addToCart: sl(),
+      updateCartQuantity: sl(),
+      removeFromCart: sl(),
+    ),
+  );
+
+  // Dashboard
+  sl.registerFactory(() => DashboardProductBloc(getProducts: sl()));
+
+  // ─── Customer Product ──────────────────────────────────────────
+  sl.registerFactory(
+    () => CustomerProductBloc(getProducts: sl(), getCategories: sl()),
+  );
+
+  // ─── Address ──────────────────────────────────────────────────
+  sl.registerLazySingleton<AddressSupabaseDataSource>(
+    () => AddressSupabaseDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<AddressRepository>(
+    () => AddressRepositoryImpl(dataSource: sl()),
+  );
+  sl.registerLazySingleton(() => GetAddresses(sl()));
+  sl.registerLazySingleton(() => CreateAddress(sl()));
+  sl.registerLazySingleton(() => UpdateAddress(sl()));
+  sl.registerLazySingleton(() => DeleteAddress(sl()));
+  sl.registerLazySingleton(() => SetDefaultAddress(sl()));
+  sl.registerFactory(
+    () => AddressBloc(
+      getAddresses: sl(),
+      createAddress: sl(),
+      updateAddress: sl(),
+      deleteAddress: sl(),
+      setDefaultAddress: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton<OrderSupabaseDataSource>(
+    () => OrderSupabaseDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<OrderRepository>(
+    () => OrderRepositoryImpl(dataSource: sl()),
+  );
+  sl.registerLazySingleton(() => CreateOrder(sl()));
+  sl.registerLazySingleton(() => GetMyOrders(sl()));
+  sl.registerLazySingleton(() => UploadPaymentProof(sl()));
+
+  sl.registerLazySingleton(() => ChangePassword(sl()));
 }

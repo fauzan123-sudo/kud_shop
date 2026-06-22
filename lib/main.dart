@@ -6,10 +6,11 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'core/bootstrap/app_bootstrap.dart';
 import 'core/config/app_config.dart';
 import 'core/navigation/app_router.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
- 
   await AppBootstrap.init();
+  await initializeDateFormatting('id_ID','');
   runApp(const MyApp());
 }
 

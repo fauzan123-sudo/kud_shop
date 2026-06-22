@@ -8,6 +8,7 @@ import 'package:kud_shop/src/auth/domain/entities/user_entity.dart';
 import 'package:kud_shop/src/auth/presentation/bloc/auth_bloc.dart';
 import 'package:kud_shop/src/auth/presentation/bloc/auth_event.dart';
 import 'package:kud_shop/src/auth/presentation/bloc/auth_state.dart';
+import 'package:kud_shop/src/customer/order/presentation/pages/order_list_page.dart';
 import '../widget/profile_header.dart';
 import '../widget/profile_info_card.dart';
 import '../widget/profile_menu_button.dart';
@@ -114,6 +115,37 @@ class _ProfileContentState extends State<_ProfileContent> {
               }
             },
           ),
+          const SizedBox(height: 8),
+          ProfileMenuButton(
+            icon: Icons.lock_outline,
+            label: 'Ubah Password',
+            color: Colors.purple,
+            onTap: () => context.push(
+              user.isAdmin
+                  ? AppRoutes.adminChangePassword
+                  : AppRoutes.customerChangePassword,
+            ),
+          ),
+          const SizedBox(height: 8),
+          ProfileMenuButton(
+            icon: Icons.location_on_outlined,
+            label: 'Alamat Saya',
+            color: Colors.green,
+            onTap: () => context.push(AppRoutes.customerAddressList),
+          ),
+          const SizedBox(height: 8),
+          ProfileMenuButton(
+            icon: Icons.receipt_long_outlined,
+            label: 'Riwayat Pesanan',
+            color: Colors.orange,
+            onTap: () {
+              Navigator.of(
+                context,
+                rootNavigator: true,
+              ).push(MaterialPageRoute(builder: (_) => const OrderListPage()));
+            },
+          ),
+          const SizedBox(height: 8),
           const SizedBox(height: 8),
           ProfileMenuButton(
             icon: Icons.logout,

@@ -14,7 +14,8 @@ class AppRoutes {
   static const String adminProfile = '/admin/profile';
   static const String adminCategory = '/admin/product/category';
   static const String adminProductDetail = '/admin/product/detail';
-   static const String adminProfileEdit = '/admin/profile/edit';
+  static const String adminProfileEdit = '/admin/profile/edit';
+  static const String adminChangePassword = '/admin/profile/change-password';
 
   // Customer
   static const String customerHome = '/customer';
@@ -23,4 +24,9 @@ class AppRoutes {
   static const String customerCheckout = '/customer/checkout';
   static const String customerProfile = '/customer/profile';
   static const String customerProfileEdit = '/customer/profile/edit';
+  static const String customerChangePassword = '/customer/profile/change-password';
+  static const String customerProductDetail = '/customer/product/detail';
+  static const String customerAddressList = '/customer/address';
+  static const String customerOrderHistory = '/customer/order/history'; 
+  static const String customerPaymentProof = '/customer/payment-proof';
 }

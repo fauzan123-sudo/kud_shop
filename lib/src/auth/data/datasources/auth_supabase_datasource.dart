@@ -12,5 +12,9 @@ abstract class AuthSupabaseDataSource {
   Future<void> logout();
 
   Future<UserModel> getCurrentUser();
-}
 
+  Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  });
+}
