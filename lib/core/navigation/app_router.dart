@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kud_shop/src/admin/category/presentation/pages/category_page.dart';
+import 'package:kud_shop/src/admin/dashboard/presentation/pages/admin_dashboard_page.dart';
+import 'package:kud_shop/src/admin/order/presentation/pages/admin_order_page.dart';
 import 'package:kud_shop/src/admin/product/domain/entities/product_entity.dart';
 import 'package:kud_shop/src/admin/product/presentation/bloc/product_bloc.dart';
 import 'package:kud_shop/src/admin/product/presentation/pages/admin_product_page.dart';
@@ -46,8 +48,7 @@ class AppRouter {
         if (authState is AuthInitial || authState is AuthLoading) {
           final isAuthPage =
               location == AppRoutes.login || location == AppRoutes.register;
-          if (isAuthPage)
-            return null; 
+          if (isAuthPage) return null;
           return location == AppRoutes.splash ? null : AppRoutes.splash;
         }
 
@@ -163,7 +164,7 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: AppRoutes.adminHome,
-                  builder: (_, __) => const AdminDashboardPlaceholder(),
+                  builder: (_, __) => const AdminDashboardPage(),
                 ),
               ],
             ),
@@ -172,7 +173,7 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: AppRoutes.adminOrder,
-                  builder: (_, __) => const AdminOrderPlaceholder(),
+                  builder: (_, __) => const AdminOrderPage(),
                 ),
               ],
             ),

@@ -10,6 +10,7 @@ import 'package:kud_shop/src/admin/product/domain/entities/product_entity.dart';
 import 'package:kud_shop/src/admin/product/presentation/bloc/product_bloc.dart';
 import 'package:kud_shop/src/admin/product/presentation/bloc/product_event.dart';
 import 'package:kud_shop/src/admin/product/presentation/bloc/product_state.dart';
+import 'package:kud_shop/src/admin/product/presentation/pages/product_form_page.dart';
 import '../widget/product_card.dart';
 
 class AdminProductPage extends StatelessWidget {
@@ -36,9 +37,23 @@ class _ProductView extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.category_outlined),
+            tooltip: 'Kelola Kategori',
+            onPressed: () => context.push(AppRoutes.adminCategory),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push(AppRoutes.adminProductAdd),
+        onPressed: () => Navigator.of(context, rootNavigator: true).push(
+          MaterialPageRoute(
+            builder: (_) => BlocProvider.value(
+              value: context.read<ProductBloc>(),
+              child: const ProductFormPage(),
+            ),
+          ),
+        ),
         backgroundColor: Theme.of(context).colorScheme.primary,
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -75,9 +90,13 @@ class _ProductView extends StatelessWidget {
             itemBuilder: (context, index) {
               return ProductCard(
                 product: products[index],
-                onEdit: () => context.push(
-                  AppRoutes.adminProductEdit,
-                  extra: products[index],
+                onEdit: () => Navigator.of(context, rootNavigator: true).push(
+                  MaterialPageRoute(
+                    builder: (_) => BlocProvider.value(
+                      value: context.read<ProductBloc>(),
+                      child: ProductFormPage(product: products[index]),
+                    ),
+                  ),
                 ),
               );
             },

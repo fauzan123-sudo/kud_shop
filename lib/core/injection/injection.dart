@@ -7,6 +7,15 @@ import 'package:kud_shop/src/admin/category/domain/usecases/delete_category.dart
 import 'package:kud_shop/src/admin/category/domain/usecases/get_categories.dart';
 import 'package:kud_shop/src/admin/category/domain/usecases/update_category.dart';
 import 'package:kud_shop/src/admin/category/presentation/bloc/category_bloc.dart';
+import 'package:kud_shop/src/admin/dashboard/data/datasources/admin_dashboard_datasource.dart';
+import 'package:kud_shop/src/admin/dashboard/data/repositories/admin_dashboard_repository.dart';
+import 'package:kud_shop/src/admin/dashboard/presentation/bloc/admin_dashboard_bloc.dart';
+import 'package:kud_shop/src/admin/order/data/datasouces/admin_order_datasource.dart';
+import 'package:kud_shop/src/admin/order/data/repositories/admin_order_repository_impl.dart';
+import 'package:kud_shop/src/admin/order/domain/repositories/admin_order_repository.dart';
+import 'package:kud_shop/src/admin/order/domain/usecases/get_all_orders.dart';
+import 'package:kud_shop/src/admin/order/domain/usecases/update_order_status.dart';
+import 'package:kud_shop/src/admin/order/presentation/bloc/admin_order_bloc.dart';
 import 'package:kud_shop/src/auth/data/datasources/auth_supabase_datasource.dart';
 import 'package:kud_shop/src/auth/data/datasources/auth_supabase_datasource_impl.dart';
 import 'package:kud_shop/src/auth/data/repositories/auth_repository_impl.dart';
@@ -182,4 +191,26 @@ void initDependencies() {
   sl.registerLazySingleton(() => UploadPaymentProof(sl()));
 
   sl.registerLazySingleton(() => ChangePassword(sl()));
+
+  // ─── Admin Order ──────────────────────────────────────────
+  sl.registerLazySingleton<AdminOrderDataSource>(
+    () => AdminOrderDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<AdminOrderRepository>(
+    () => AdminOrderRepositoryImpl(dataSource: sl()),
+  );
+  sl.registerLazySingleton(() => GetAllOrders(sl()));
+  sl.registerLazySingleton(() => UpdateOrderStatus(sl()));
+  sl.registerFactory(
+    () => AdminOrderBloc(getAllOrders: sl(), updateOrderStatus: sl()),
+  );
+
+  // ─── Admin Dashboard ──────────────────────────────────────
+  sl.registerLazySingleton<AdminDashboardDataSource>(
+    () => AdminDashboardDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<AdminDashboardRepository>(
+    () => AdminDashboardRepositoryImpl(dataSource: sl()),
+  );
+  sl.registerFactory(() => AdminDashboardBloc(repository: sl()));
 }
