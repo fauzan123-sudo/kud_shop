@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kud_shop/component/themes/app_text_style.dart';
+import 'package:kud_shop/core/utils/currency_formatter.dart';
 import 'package:kud_shop/src/customer/cart/domain/entities/cart_item_entity.dart';
 
 class CheckoutSummaryItem extends StatelessWidget {
@@ -41,7 +42,7 @@ class CheckoutSummaryItem extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${item.quantity} x Rp ${_formatPrice(item.productPrice)}',
+                  '${item.quantity} x Rp ${CurrencyFormatter.format(item.productPrice)}',
                   style: AppTextStyle.bodySmall.copyWith(
                     color: Colors.grey.shade600,
                   ),
@@ -50,7 +51,7 @@ class CheckoutSummaryItem extends StatelessWidget {
             ),
           ),
           Text(
-            'Rp ${_formatPrice(item.subtotal)}',
+            'Rp ${CurrencyFormatter.format(item.subtotal)}',
             style: AppTextStyle.bodyMedium.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -71,14 +72,5 @@ class CheckoutSummaryItem extends StatelessWidget {
         color: Colors.grey.shade400,
       ),
     );
-  }
-
-  String _formatPrice(double price) {
-    return price
-        .toStringAsFixed(0)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]}.',
-        );
   }
 }

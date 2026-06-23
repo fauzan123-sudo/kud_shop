@@ -6,6 +6,7 @@ import 'package:kud_shop/component/widgets/button/app_button.dart';
 import 'package:kud_shop/component/widgets/loading/loading_widget.dart';
 import 'package:kud_shop/core/injection/injection.dart';
 import 'package:kud_shop/core/usecases/usecase.dart';
+import 'package:kud_shop/core/utils/currency_formatter.dart';
 import 'package:kud_shop/src/customer/address/domain/entities/address_entity.dart';
 import 'package:kud_shop/src/customer/address/domain/usecases/get_addresses.dart';
 import 'package:kud_shop/src/customer/address/presentation/pages/address_list_page.dart';
@@ -253,7 +254,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
                 _buildRadioOption(
                   label: 'Diantar (Delivery)',
-                  subtitle: 'Biaya kirim Rp ${_formatPrice(_shippingFee)}',
+                  subtitle: 'Biaya kirim Rp ${CurrencyFormatter.format(_shippingFee)}',
                   value: 'delivery',
                   groupValue: _deliveryMethod,
                   onChanged: (v) => setState(() => _deliveryMethod = v!),
@@ -421,7 +422,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               children: [
                 const Text('Subtotal', style: AppTextStyle.bodySmall),
                 Text(
-                  'Rp ${_formatPrice(_subtotal)}',
+                  'Rp ${CurrencyFormatter.format(_subtotal)}',
                   style: AppTextStyle.bodySmall,
                 ),
               ],
@@ -433,7 +434,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 children: [
                   const Text('Ongkos Kirim', style: AppTextStyle.bodySmall),
                   Text(
-                    'Rp ${_formatPrice(_shippingCost)}',
+                    'Rp ${CurrencyFormatter.format(_shippingCost)}',
                     style: AppTextStyle.bodySmall,
                   ),
                 ],
@@ -445,7 +446,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               children: [
                 const Text('Total Pembayaran', style: AppTextStyle.bodyMedium),
                 Text(
-                  'Rp ${_formatPrice(_totalPrice)}',
+                  'Rp ${CurrencyFormatter.format(_totalPrice)}',
                   style: AppTextStyle.h3.copyWith(
                     color: Theme.of(context).colorScheme.primary,
                   ),
@@ -464,12 +465,4 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-  String _formatPrice(double price) {
-    return price
-        .toStringAsFixed(0)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]}.',
-        );
-  }
 }

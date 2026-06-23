@@ -7,6 +7,7 @@ import 'package:kud_shop/component/widgets/button/app_button.dart';
 import 'package:kud_shop/component/widgets/loading/loading_widget.dart';
 import 'package:kud_shop/core/navigation/app_routes.dart';
 import 'package:kud_shop/core/navigation/route_observer.dart';
+import 'package:kud_shop/core/utils/currency_formatter.dart';
 import '../bloc/cart_bloc.dart';
 import '../bloc/cart_event.dart';
 import '../bloc/cart_state.dart';
@@ -146,7 +147,7 @@ class _CartPageState extends State<CartPage> with RouteAware {
                   style: AppTextStyle.bodyMedium,
                 ),
                 Text(
-                  'Rp ${_formatPrice(state.totalPrice)}',
+                  'Rp ${CurrencyFormatter.format(state.totalPrice)}',
                   style: AppTextStyle.h3.copyWith(
                     color: Theme.of(context).colorScheme.primary,
                   ),
@@ -195,14 +196,5 @@ class _CartPageState extends State<CartPage> with RouteAware {
         ],
       ),
     );
-  }
-
-  String _formatPrice(double price) {
-    return price
-        .toStringAsFixed(0)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]}.',
-        );
   }
 }

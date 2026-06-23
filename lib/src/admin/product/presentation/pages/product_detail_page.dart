@@ -3,6 +3,7 @@ import 'package:kud_shop/component/themes/app_text_style.dart';
 import 'package:kud_shop/core/injection/injection.dart';
 import 'package:kud_shop/core/navigation/app_routes.dart';
 import 'package:kud_shop/core/usecases/usecase.dart';
+import 'package:kud_shop/core/utils/currency_formatter.dart';
 import 'package:kud_shop/src/admin/category/domain/entities/category_entity.dart';
 import 'package:kud_shop/src/admin/category/domain/usecases/get_categories.dart';
 import 'package:kud_shop/src/admin/product/domain/entities/product_entity.dart';
@@ -79,7 +80,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   Text(product.name, style: AppTextStyle.h2),
                   const SizedBox(height: 8),
                   Text(
-                    'Rp ${_formatPrice(product.price)}',
+                    'Rp ${CurrencyFormatter.format(product.price)}',
                     style: AppTextStyle.h3.copyWith(
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -222,12 +223,4 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     return Colors.green;
   }
 
-  String _formatPrice(double price) {
-    return price
-        .toStringAsFixed(0)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]}.',
-        );
-  }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kud_shop/component/themes/app_text_style.dart';
 import 'package:kud_shop/component/widgets/app_snackbar.dart';
 import 'package:kud_shop/core/injection/injection.dart';
+import 'package:kud_shop/core/utils/currency_formatter.dart';
 import 'package:kud_shop/src/customer/order/domain/entities/order_entity.dart';
 import '../bloc/admin_order_bloc.dart';
 import 'admin_order_detail_page.dart';
@@ -219,7 +220,7 @@ class _OrderCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Rp ${_formatPrice(order.totalPrice)}',
+                  'Rp ${CurrencyFormatter.format(order.totalPrice)}',
                   style: AppTextStyle.bodyMedium.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -250,15 +251,6 @@ class _OrderCard extends StatelessWidget {
     return '${date.day} ${months[date.month - 1]} ${date.year}, '
         '${date.hour.toString().padLeft(2, '0')}:'
         '${date.minute.toString().padLeft(2, '0')}';
-  }
-
-  String _formatPrice(double price) {
-    return price
-        .toStringAsFixed(0)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]}.',
-        );
   }
 }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kud_shop/component/themes/app_text_style.dart';
+import 'package:kud_shop/core/utils/currency_formatter.dart';
 import 'package:kud_shop/src/admin/product/domain/entities/product_entity.dart';
 
 class CustomerProductCard extends StatelessWidget {
@@ -65,7 +66,7 @@ class CustomerProductCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Rp ${_formatPrice(product.price)}',
+                    'Rp ${CurrencyFormatter.format(product.price)}',
                     style: AppTextStyle.bodyMedium.copyWith(
                       color: Theme.of(context).colorScheme.primary,
                       fontWeight: FontWeight.bold,
@@ -97,14 +98,5 @@ class CustomerProductCard extends StatelessWidget {
         color: Colors.grey.shade400,
       ),
     );
-  }
-
-  String _formatPrice(double price) {
-    return price
-        .toStringAsFixed(0)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]}.',
-        );
   }
 }

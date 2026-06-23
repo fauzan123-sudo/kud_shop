@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kud_shop/component/themes/app_text_style.dart';
 import 'package:kud_shop/component/widgets/button/app_button.dart';
 import 'package:kud_shop/core/navigation/app_routes.dart';
+import 'package:kud_shop/core/utils/currency_formatter.dart';
 import '../../domain/entities/order_entity.dart';
 
 class OrderSuccessPage extends StatelessWidget {
@@ -87,7 +88,7 @@ class OrderSuccessPage extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildRow('Total Pembayaran', 'Rp ${_formatPrice(order.totalPrice)}'),
+          _buildRow('Total Pembayaran', 'Rp ${CurrencyFormatter.format(order.totalPrice)}'),
           const SizedBox(height: 8),
           _buildRow('Metode Pengiriman', _deliveryLabel(order.deliveryMethod)),
           const SizedBox(height: 8),
@@ -119,14 +120,5 @@ class OrderSuccessPage extends StatelessWidget {
 
   String _paymentLabel(String method) {
     return method == 'transfer' ? 'Transfer Bank' : 'Bayar di Tempat (COD)';
-  }
-
-  String _formatPrice(double price) {
-    return price
-        .toStringAsFixed(0)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]}.',
-        );
   }
 }

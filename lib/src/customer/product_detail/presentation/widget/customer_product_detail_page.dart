@@ -5,6 +5,7 @@ import 'package:kud_shop/component/widgets/app_snackbar.dart';
 import 'package:kud_shop/component/widgets/button/app_button.dart';
 import 'package:kud_shop/core/injection/injection.dart';
 import 'package:kud_shop/core/navigation/app_routes.dart';
+import 'package:kud_shop/core/utils/currency_formatter.dart';
 import 'package:kud_shop/src/admin/product/domain/entities/product_entity.dart';
 import 'package:kud_shop/src/customer/cart/domain/usecases/add_to_cart.dart';
 import '../widget/quantity_stepper.dart';
@@ -49,7 +50,7 @@ class _CustomerProductDetailPageState
                   Text(product.name, style: AppTextStyle.h2),
                   const SizedBox(height: 8),
                   Text(
-                    'Rp ${_formatPrice(product.price)}',
+                    'Rp ${CurrencyFormatter.format(product.price)}',
                     style: AppTextStyle.h3.copyWith(
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -259,14 +260,5 @@ class _CustomerProductDetailPageState
     } catch (_) {
       if (mounted) setState(() => _isAddingToCart = false);
     }
-  }
-
-  String _formatPrice(double price) {
-    return price
-        .toStringAsFixed(0)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]}.',
-        );
   }
 }

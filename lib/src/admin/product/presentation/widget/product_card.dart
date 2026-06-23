@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kud_shop/component/themes/app_text_style.dart';
 import 'package:kud_shop/core/navigation/app_routes.dart';
+import 'package:kud_shop/core/utils/currency_formatter.dart';
 import 'package:kud_shop/src/admin/product/domain/entities/product_entity.dart';
 import 'package:kud_shop/src/admin/product/presentation/bloc/product_bloc.dart';
 import 'package:kud_shop/src/admin/product/presentation/bloc/product_event.dart';
@@ -70,7 +71,7 @@ class ProductCard extends StatelessWidget {
 
                     // Harga
                     Text(
-                      'Rp ${_formatPrice(product.price)}',
+                      'Rp ${CurrencyFormatter.format(product.price)}',
                       style: AppTextStyle.bodyMedium.copyWith(
                         color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.w600,
@@ -181,14 +182,5 @@ class ProductCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatPrice(double price) {
-    return price
-        .toStringAsFixed(0)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]}.',
-        );
   }
 }

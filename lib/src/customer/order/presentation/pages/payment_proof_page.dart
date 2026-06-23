@@ -7,6 +7,7 @@ import 'package:kud_shop/component/widgets/app_snackbar.dart';
 import 'package:kud_shop/component/widgets/button/app_button.dart';
 import 'package:kud_shop/core/injection/injection.dart';
 import 'package:kud_shop/core/navigation/app_routes.dart';
+import 'package:kud_shop/core/utils/currency_formatter.dart';
 import '../../domain/entities/order_entity.dart';
 import '../../domain/usecases/upload_payment_proof.dart';
 
@@ -140,7 +141,7 @@ class _PaymentProofPageState extends State<PaymentProofPage> {
               children: [
                 const TextSpan(text: 'Silahkan Transfer Sesuai Nominal\n'),
                 TextSpan(
-                  text: 'Rp ${_formatPrice(widget.order.totalPrice)}',
+                  text: 'Rp ${CurrencyFormatter.format(widget.order.totalPrice)}',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const TextSpan(
@@ -226,14 +227,5 @@ class _PaymentProofPageState extends State<PaymentProofPage> {
         ),
       ),
     );
-  }
-
-  String _formatPrice(double price) {
-    return price
-        .toStringAsFixed(0)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]}.',
-        );
   }
 }

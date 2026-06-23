@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kud_shop/component/themes/app_text_style.dart';
 import 'package:kud_shop/component/widgets/button/app_button.dart';
+import 'package:kud_shop/core/utils/currency_formatter.dart';
 import '../../domain/entities/order_entity.dart';
 
 class OrderDetailPage extends StatelessWidget {
@@ -54,7 +55,7 @@ class OrderDetailPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Rp ${_formatPrice(order.totalPrice)}',
+                      'Rp ${CurrencyFormatter.format(order.totalPrice)}',
                       style: AppTextStyle.h3,
                     ),
                   ],
@@ -85,7 +86,7 @@ class OrderDetailPage extends StatelessWidget {
             ),
           ),
           Text(
-            'Rp ${_formatPrice(item.subtotal)}',
+            'Rp ${CurrencyFormatter.format(item.subtotal)}',
             style: AppTextStyle.bodyMedium.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -120,14 +121,5 @@ class OrderDetailPage extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     return DateFormat('EEEE, d MMMM yyyy, HH:mm', 'id_ID').format(date);
-  }
-
-  String _formatPrice(double price) {
-    return price
-        .toStringAsFixed(0)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]}.',
-        );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kud_shop/component/themes/app_text_style.dart';
 import 'package:kud_shop/component/widgets/app_snackbar.dart';
+import 'package:kud_shop/core/utils/currency_formatter.dart';
 import 'package:kud_shop/src/customer/order/domain/entities/order_entity.dart';
 import '../bloc/admin_order_bloc.dart';
 
@@ -209,7 +210,7 @@ class _AdminOrderDetailPageState extends State<AdminOrderDetailPage> {
                   ),
                 ),
                 Text(
-                  'Rp ${_formatPrice(item.subtotal)}',
+                  'Rp ${CurrencyFormatter.format(item.subtotal)}',
                   style: AppTextStyle.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -279,7 +280,7 @@ class _AdminOrderDetailPageState extends State<AdminOrderDetailPage> {
             style: AppTextStyle.bodySmall.copyWith(color: Colors.grey.shade600),
           ),
           const SizedBox(height: 4),
-          Text('Rp ${_formatPrice(_order.totalPrice)}', style: AppTextStyle.h3),
+          Text('Rp ${CurrencyFormatter.format(_order.totalPrice)}', style: AppTextStyle.h3),
         ],
       ),
     );
@@ -390,14 +391,5 @@ class _AdminOrderDetailPageState extends State<AdminOrderDetailPage> {
     return '${days[date.weekday - 1]}, ${date.day} ${months[date.month - 1]} '
         '${date.year}, ${date.hour.toString().padLeft(2, '0')}:'
         '${date.minute.toString().padLeft(2, '0')}';
-  }
-
-  String _formatPrice(double price) {
-    return price
-        .toStringAsFixed(0)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]}.',
-        );
   }
 }

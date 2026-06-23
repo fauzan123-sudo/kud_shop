@@ -3,6 +3,7 @@ import 'package:kud_shop/component/themes/app_text_style.dart';
 import 'package:kud_shop/component/widgets/app_snackbar.dart';
 import 'package:kud_shop/core/injection/injection.dart';
 import 'package:kud_shop/core/usecases/usecase.dart';
+import 'package:kud_shop/core/utils/currency_formatter.dart';
 import '../../domain/entities/order_entity.dart';
 import '../../domain/usecases/get_my_orders.dart';
 import 'order_detail_page.dart';
@@ -195,7 +196,7 @@ class _OrderListPageState extends State<OrderListPage> {
                   ),
                 ),
                 Text(
-                  'Rp ${_formatPrice(order.totalPrice)}',
+                  'Rp ${CurrencyFormatter.format(order.totalPrice)}',
                   style: AppTextStyle.bodyMedium.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -259,14 +260,5 @@ class _OrderListPageState extends State<OrderListPage> {
       'Desember',
     ];
     return '${days[date.weekday - 1]}, ${date.day} ${months[date.month - 1]} ${date.year}';
-  }
-
-  String _formatPrice(double price) {
-    return price
-        .toStringAsFixed(0)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]}.',
-        );
   }
 }
