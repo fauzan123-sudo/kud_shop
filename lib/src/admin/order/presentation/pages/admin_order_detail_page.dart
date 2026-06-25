@@ -127,7 +127,7 @@ class _AdminOrderDetailPageState extends State<AdminOrderDetailPage> {
           const Text('Ubah Status Pesanan', style: AppTextStyle.label),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
-            value: _order.status,
+            initialValue: _order.status,
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.grey.shade50,

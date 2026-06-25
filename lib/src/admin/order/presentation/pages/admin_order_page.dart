@@ -32,14 +32,6 @@ class _AdminOrderView extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => context.read<AdminOrderBloc>().add(
-              const AdminOrderEvent.load(),
-            ),
-          ),
-        ],
       ),
       body: BlocConsumer<AdminOrderBloc, AdminOrderState>(
         listener: (context, state) {
@@ -55,8 +47,9 @@ class _AdminOrderView extends StatelessWidget {
             initial: () => true,
             orElse: () => false,
           );
-          if (isLoading)
+          if (isLoading) {
             return const Center(child: CircularProgressIndicator());
+          }
 
           final errorMsg = state.maybeWhen(
             error: (msg) => msg,

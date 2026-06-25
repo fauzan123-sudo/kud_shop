@@ -32,14 +32,14 @@ class _DashboardView extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => context.read<AdminDashboardBloc>().add(
-              const AdminDashboardLoad(),
-            ),
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.refresh),
+        //     onPressed: () => context.read<AdminDashboardBloc>().add(
+        //       const AdminDashboardLoad(),
+        //     ),
+        //   ),
+        // ],
       ),
       body: BlocConsumer<AdminDashboardBloc, AdminDashboardState>(
         listener: (context, state) {

@@ -56,28 +56,27 @@ class _LoginPageState extends State<LoginPage> {
               child: Form(
                 key: _formKey,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 60),
 
-                    // ─── Header ──────────────────────────────
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Icon(
-                        Icons.storefront,
-                        color: Colors.white,
-                        size: 32,
+                    Image.asset(
+                      'assets/images/kud_logo.png',
+                      width: 120, // ← lebih besar
+                      height: 120,
+                    ),
+                    const SizedBox(height: 12), 
+
+                    const Text('Koperasi Unit Desa', style: AppTextStyle.h1),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Sumber Manjing Wetan',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2C974A), 
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    const Text('Selamat datang', style: AppTextStyle.h1),
-                    const SizedBox(height: 8),
-                    Text('Masuk ke akun Anda', style: AppTextStyle.hint),
                     const SizedBox(height: 48),
 
                     // ─── Error Message ────────────────────────

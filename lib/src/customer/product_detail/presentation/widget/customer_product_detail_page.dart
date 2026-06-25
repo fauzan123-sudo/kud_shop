@@ -202,7 +202,7 @@ class _CustomerProductDetailPageState
           children: [
             Expanded(
               child: AppButton(
-                label: 'Tambah ke Keranjang',
+                label: 'Keranjang',
                 backgroundColor: Colors.white,
                 foregroundColor: Theme.of(context).colorScheme.primary,
                 isLoading: _isAddingToCart,

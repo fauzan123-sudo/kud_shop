@@ -71,22 +71,24 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.4
 
 flutter_native_splash:
-  color: "#1565C0"
-  image: assets/images/PG_logo.png
-  color_dark: "#0D47A1"
-  image_dark: assets/images/PG_logo.png
+  color: "#FFFFFF"
+  image: assets/images/kud_logo.png
+  color_dark: "#FFFFFF"
+  image_dark: assets/images/kud_logo.png
   android_12:
-    image: assets/images/PG_logo.png
-    color: "#1565C0"
+    image: assets/images/kud_logo.png
+    color: "#FFFFFF"
+    image_dark: assets/images/kud_logo.png
+    color_dark: "#FFFFFF"
   fullscreen: true
 
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/PG_logo.png"
+  image_path: "assets/images/kud_logo.png"
   min_sdk_android: 21
   adaptive_icon_background: "#1565C0"
-  adaptive_icon_foreground: "assets/images/PG_logo.png"
+  adaptive_icon_foreground: "assets/images/kud_logo.png"
 
 flutter:
   uses-material-design: true

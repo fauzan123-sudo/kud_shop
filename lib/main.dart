@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:kud_shop/component/themes/app_theme.dart';
+import 'package:kud_shop/core/config/app_system_ui.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'core/bootstrap/app_bootstrap.dart';
@@ -10,7 +11,8 @@ import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
   await AppBootstrap.init();
-  await initializeDateFormatting('id_ID','');
+  await initializeDateFormatting('id_ID', '');
+  AppSystemUI.setStatusBar();
   runApp(const MyApp());
 }
 
@@ -38,6 +40,8 @@ class MyApp extends StatelessWidget {
         routerConfig: AppRouter.createRouter(),
         title: AppConfig.appName,
         theme: AppTheme.lightTheme,
+        // darkTheme: AppTheme.darkTheme,
+        // themeMode: ThemeMode.dark,
         builder: (context, child) => ResponsiveBreakpoints.builder(
           child: child!,
           breakpoints: const [

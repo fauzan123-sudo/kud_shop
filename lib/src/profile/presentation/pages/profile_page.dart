@@ -9,6 +9,7 @@ import 'package:kud_shop/src/auth/presentation/bloc/auth_bloc.dart';
 import 'package:kud_shop/src/auth/presentation/bloc/auth_event.dart';
 import 'package:kud_shop/src/auth/presentation/bloc/auth_state.dart';
 import 'package:kud_shop/src/customer/order/presentation/pages/order_list_page.dart';
+import 'package:kud_shop/src/profile/presentation/widget/profile_shimmer.dart';
 import '../widget/profile_header.dart';
 import '../widget/profile_info_card.dart';
 import '../widget/profile_menu_button.dart';
@@ -37,8 +38,11 @@ class ProfilePage extends StatelessWidget {
         ),
         body: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
+            if (state is AuthLoading || state is AuthInitial) {
+              return const ProfileShimmer(); 
+            }
             if (state is! AuthAuthenticated) {
-              return const Center(child: CircularProgressIndicator());
+              return const ProfileShimmer();
             }
             return _ProfileContent(user: state.user);
           },
@@ -58,9 +62,6 @@ class _ProfileContent extends StatefulWidget {
 }
 
 class _ProfileContentState extends State<_ProfileContent> {
-  // ─── Override lokal setelah edit profil ──────────────────
-  // Dipakai supaya tampilan langsung update tanpa perlu
-  // trigger AuthEvent.started() yang memicu redirect ke splash.
   UserEntity? _localOverride;
 
   UserEntity get _user => _localOverride ?? widget.user;

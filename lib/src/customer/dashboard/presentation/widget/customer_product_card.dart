@@ -51,36 +51,48 @@ class CustomerProductCard extends StatelessWidget {
             ),
 
             // ─── Info ─────────────────────────────────
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyle.bodySmall.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Rp ${CurrencyFormatter.format(product.price)}',
-                    style: AppTextStyle.bodyMedium.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  if (product.isOutOfStock)
+            Expanded( // ← wrap dengan Expanded
+              child: Padding(
+                padding: const EdgeInsets.all(8), // ← kurangi padding
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween, // ← tambah ini
+                  children: [
                     Text(
-                      'Stok habis',
-                      style: AppTextStyle.caption.copyWith(color: Colors.red),
-                    )
-                  else
-                    Text('Stok: ${product.stock}', style: AppTextStyle.caption),
-                ],
+                      product.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyle.bodySmall.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Column( // ← group harga & stok
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Rp ${CurrencyFormatter.format(product.price)}',
+                          style: AppTextStyle.bodySmall.copyWith(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        if (product.isOutOfStock)
+                          Text(
+                            'Stok habis',
+                            style: AppTextStyle.caption.copyWith(
+                              color: Colors.red,
+                            ),
+                          )
+                        else
+                          Text(
+                            'Stok: ${product.stock}',
+                            style: AppTextStyle.caption,
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

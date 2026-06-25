@@ -5,7 +5,6 @@ import 'package:kud_shop/component/themes/app_text_style.dart';
 import 'package:kud_shop/component/widgets/loading/loading_widget.dart';
 import 'package:kud_shop/core/injection/injection.dart';
 import 'package:kud_shop/core/navigation/app_routes.dart';
-import 'package:kud_shop/src/customer/dashboard/presentation/widget/welcome_banner.dart';
 import '../bloc/dashboard_product_bloc.dart';
 import '../bloc/dashboard_product_event.dart';
 import '../bloc/dashboard_product_state.dart';
@@ -34,12 +33,6 @@ class _DashboardView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: const Text('Beranda'),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-      ),
       body: BlocBuilder<DashboardProductBloc, DashboardProductState>(
         builder: (context, state) {
           return RefreshIndicator(
@@ -54,8 +47,8 @@ class _DashboardView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const WelcomeBanner(),
-                  const SizedBox(height: 20),
+                  // const WelcomeBanner(),
+                  const SizedBox(height: 30),
 
                   // ─── Search bar ───────────────────────
                   ProductSearchBar(
@@ -65,8 +58,6 @@ class _DashboardView extends StatelessWidget {
                       );
                     },
                   ),
-                  const SizedBox(height: 20),
-
                   // ─── Header list produk ───────────────
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -154,7 +145,7 @@ class _DashboardView extends StatelessWidget {
         crossAxisCount: 2,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
-        childAspectRatio: 0.68,
+        childAspectRatio: 0.62,
       ),
       itemBuilder: (context, index) {
         final product = displayed[index];

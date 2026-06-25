@@ -4,6 +4,7 @@ import 'package:kud_shop/component/themes/app_text_style.dart';
 import 'package:kud_shop/component/widgets/button/app_button.dart';
 import 'package:kud_shop/core/navigation/app_routes.dart';
 import 'package:kud_shop/core/utils/currency_formatter.dart';
+import 'package:kud_shop/src/customer/order/presentation/pages/order_list_page.dart';
 import '../../domain/entities/order_entity.dart';
 
 class OrderSuccessPage extends StatelessWidget {
@@ -56,9 +57,10 @@ class OrderSuccessPage extends StatelessWidget {
               AppButton(
                 label: 'Lihat Pesanan Saya',
                 onPressed: () {
-                  // TODO: ganti ke AppRoutes.customerOrderHistory
-                  // setelah halaman Riwayat Order dibuat.
-                  context.go(AppRoutes.customerHome);
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(builder: (_) => const OrderListPage()),
+                  );
                 },
               ),
               const SizedBox(height: 12),
@@ -88,7 +90,10 @@ class OrderSuccessPage extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildRow('Total Pembayaran', 'Rp ${CurrencyFormatter.format(order.totalPrice)}'),
+          _buildRow(
+            'Total Pembayaran',
+            'Rp ${CurrencyFormatter.format(order.totalPrice)}',
+          ),
           const SizedBox(height: 8),
           _buildRow('Metode Pengiriman', _deliveryLabel(order.deliveryMethod)),
           const SizedBox(height: 8),
@@ -106,9 +111,17 @@ class OrderSuccessPage extends StatelessWidget {
           label,
           style: AppTextStyle.bodySmall.copyWith(color: Colors.grey.shade600),
         ),
-        Text(
-          value,
-          style: AppTextStyle.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+        const SizedBox(width: 8),
+        Flexible(
+          // ← tambahkan ini
+          child: Text(
+            value,
+            textAlign: TextAlign.end, 
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyle.bodyMedium.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
       ],
     );

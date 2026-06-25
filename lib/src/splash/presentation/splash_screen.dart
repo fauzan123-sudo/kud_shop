@@ -11,18 +11,11 @@ class SplashScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: Colors.blue.shade600,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Icon(
-                Icons.business,
-                color: Colors.white,
-                size: 40,
-              ),
+            Image.asset(
+              'assets/images/kud_logo.png',
+              width: 120,
+              height: 120,
+              fit: BoxFit.contain,
             ),
             const SizedBox(height: 24),
             const CircularProgressIndicator(),

@@ -254,7 +254,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
                 _buildRadioOption(
                   label: 'Diantar (Delivery)',
-                  subtitle: 'Biaya kirim Rp ${CurrencyFormatter.format(_shippingFee)}',
+                  subtitle:
+                      'Biaya kirim Rp ${CurrencyFormatter.format(_shippingFee)}',
                   value: 'delivery',
                   groupValue: _deliveryMethod,
                   onChanged: (v) => setState(() => _deliveryMethod = v!),
@@ -378,9 +379,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
     required String groupValue,
     required ValueChanged<String?> onChanged,
   }) {
+    // ignore: deprecated_member_use
     return RadioListTile<String>(
       value: value,
+      // ignore: deprecated_member_use
       groupValue: groupValue,
+      // ignore: deprecated_member_use
       onChanged: onChanged,
       title: Text(label, style: AppTextStyle.bodyMedium),
       subtitle: subtitle != null
@@ -464,5 +468,4 @@ class _CheckoutPageState extends State<CheckoutPage> {
       ),
     );
   }
-
 }
