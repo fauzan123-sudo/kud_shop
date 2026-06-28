@@ -26,7 +26,7 @@ class AddressBloc extends Bloc<AddressEvent, AddressState> {
         _updateAddress = updateAddress,
         _deleteAddress = deleteAddress,
         _setDefaultAddress = setDefaultAddress,
-        super(const AddressInitial()) {
+        super(const AddressState.initial()) {
     on<AddressLoad>(_onLoad);
     on<AddressCreate>(_onCreate);
     on<AddressUpdate>(_onUpdate);
@@ -35,18 +35,15 @@ class AddressBloc extends Bloc<AddressEvent, AddressState> {
   }
 
   Future<void> _onLoad(AddressLoad event, Emitter<AddressState> emit) async {
-    emit(const AddressLoading());
+    emit(const AddressState.loading());
     final result = await _getAddresses(const NoParams());
     result.fold(
-      (failure) => emit(AddressError(failure.message)),
-      (addresses) => emit(AddressLoaded(addresses)),
+      (failure) => emit(AddressState.error(failure.message)),
+      (addresses) => emit(AddressState.loaded(addresses)),
     );
   }
 
-  Future<void> _onCreate(
-    AddressCreate event,
-    Emitter<AddressState> emit,
-  ) async {
+  Future<void> _onCreate(AddressCreate event, Emitter<AddressState> emit) async {
     final result = await _createAddress(
       CreateAddressParams(
         recipientName: event.recipientName,
@@ -56,15 +53,12 @@ class AddressBloc extends Bloc<AddressEvent, AddressState> {
       ),
     );
     await result.fold(
-      (failure) async => emit(AddressError(failure.message)),
+      (failure) async => emit(AddressState.error(failure.message)),
       (_) async => _reloadWithMessage(emit, 'Alamat berhasil ditambahkan'),
     );
   }
 
-  Future<void> _onUpdate(
-    AddressUpdate event,
-    Emitter<AddressState> emit,
-  ) async {
+  Future<void> _onUpdate(AddressUpdate event, Emitter<AddressState> emit) async {
     final result = await _updateAddress(
       UpdateAddressParams(
         id: event.id,
@@ -74,43 +68,34 @@ class AddressBloc extends Bloc<AddressEvent, AddressState> {
       ),
     );
     await result.fold(
-      (failure) async => emit(AddressError(failure.message)),
+      (failure) async => emit(AddressState.error(failure.message)),
       (_) async => _reloadWithMessage(emit, 'Alamat berhasil diperbarui'),
     );
   }
 
-  Future<void> _onDelete(
-    AddressDelete event,
-    Emitter<AddressState> emit,
-  ) async {
+  Future<void> _onDelete(AddressDelete event, Emitter<AddressState> emit) async {
     final result = await _deleteAddress(DeleteAddressParams(id: event.id));
     await result.fold(
-      (failure) async => emit(AddressError(failure.message)),
+      (failure) async => emit(AddressState.error(failure.message)),
       (_) async => _reloadWithMessage(emit, 'Alamat berhasil dihapus'),
     );
   }
 
-  Future<void> _onSetDefault(
-    AddressSetDefault event,
-    Emitter<AddressState> emit,
-  ) async {
+  Future<void> _onSetDefault(AddressSetDefault event, Emitter<AddressState> emit) async {
     final result = await _setDefaultAddress(
       SetDefaultAddressParams(id: event.id),
     );
     await result.fold(
-      (failure) async => emit(AddressError(failure.message)),
+      (failure) async => emit(AddressState.error(failure.message)),
       (_) async => _reloadWithMessage(emit, 'Alamat utama diperbarui'),
     );
   }
 
-  Future<void> _reloadWithMessage(
-    Emitter<AddressState> emit,
-    String message,
-  ) async {
+  Future<void> _reloadWithMessage(Emitter<AddressState> emit, String message) async {
     final result = await _getAddresses(const NoParams());
     result.fold(
-      (failure) => emit(AddressError(failure.message)),
-      (addresses) => emit(AddressActionSuccess(addresses, message)),
+      (failure) => emit(AddressState.error(failure.message)),
+      (addresses) => emit(AddressState.actionSuccess(addresses, message)),
     );
   }
 }

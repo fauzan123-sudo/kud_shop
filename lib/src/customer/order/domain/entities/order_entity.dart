@@ -1,49 +1,37 @@
-class OrderItemEntity {
-  final int id;
-  final int productId;
-  final String productName;
-  final double productPrice;
-  final int quantity;
-  final double subtotal;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  const OrderItemEntity({
-    required this.id,
-    required this.productId,
-    required this.productName,
-    required this.productPrice,
-    required this.quantity,
-    required this.subtotal,
-  });
+part 'order_entity.freezed.dart';
+
+@freezed
+abstract class OrderItemEntity with _$OrderItemEntity {
+  const factory OrderItemEntity({
+    required int id,
+    required int productId,
+    required String productName,
+    required double productPrice,
+    required int quantity,
+    required double subtotal,
+  }) = _OrderItemEntity;
 }
 
-class OrderEntity {
-  final int id;
-  final double totalPrice;
-  final String deliveryMethod; // 'pickup' | 'delivery'
-  final String paymentMethod; // 'transfer' | 'cod'
-  final String? paymentProofUrl;
-  final String status; // pending, confirmed, processing, delivered, cancelled
-  final String? notes;
-  final DateTime createdAt;
-  final String recipientName;
-  final String recipientPhone;
-  final String? recipientAddress;
-  final List<OrderItemEntity> items;
+@freezed
+abstract class OrderEntity with _$OrderEntity {
+  const factory OrderEntity({
+    required int id,
+    required double totalPrice,
+    required String deliveryMethod,
+    required String paymentMethod,
+    String? paymentProofUrl,
+    required String status,
+    String? notes,
+    required DateTime createdAt,
+    required String recipientName,
+    required String recipientPhone,
+    String? recipientAddress,
+    required List<OrderItemEntity> items,
+  }) = _OrderEntity;
 
-  const OrderEntity({
-    required this.id,
-    required this.totalPrice,
-    required this.deliveryMethod,
-    required this.paymentMethod,
-    this.paymentProofUrl,
-    required this.status,
-    this.notes,
-    required this.createdAt,
-    required this.recipientName,
-    required this.recipientPhone,
-    this.recipientAddress,
-    required this.items,
-  });
+  const OrderEntity._();
 
   bool get isPending => status == 'pending';
   bool get isConfirmed => status == 'confirmed';
@@ -51,7 +39,6 @@ class OrderEntity {
   bool get isDelivered => status == 'delivered';
   bool get isCancelled => status == 'cancelled';
 
-  /// Label status dalam Bahasa Indonesia untuk ditampilkan ke user.
   String get statusLabel {
     switch (status) {
       case 'pending':

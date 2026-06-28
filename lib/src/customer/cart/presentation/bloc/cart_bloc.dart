@@ -22,19 +22,21 @@ class CartBloc extends Bloc<CartEvent, CartState> {
        _addToCart = addToCart,
        _updateCartQuantity = updateCartQuantity,
        _removeFromCart = removeFromCart,
-       super(const CartInitial()) {
+       super(const CartState.initial()) {
     on<CartLoad>(_onLoad);
     on<CartAddItem>(_onAddItem);
     on<CartUpdateQuantity>(_onUpdateQuantity);
     on<CartRemoveItem>(_onRemoveItem);
+    on<CartToggleSelect>(_onToggleSelect);
+    on<CartSelectAll>(_onSelectAll);
   }
 
   Future<void> _onLoad(CartLoad event, Emitter<CartState> emit) async {
-    emit(const CartLoading());
+    emit(const CartState.loading());
     final result = await _getCartItems(const NoParams());
     result.fold(
-      (failure) => emit(CartError(failure.message)),
-      (items) => emit(CartLoaded(items)),
+      (failure) => emit(CartState.error(failure.message)),
+      (items) => emit(CartState.loaded(items)),
     );
   }
 
@@ -43,7 +45,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       AddToCartParams(productId: event.productId, quantity: event.quantity),
     );
     await result.fold(
-      (failure) async => emit(CartError(failure.message)),
+      (failure) async => emit(CartState.error(failure.message)),
       (_) async => _onLoad(const CartLoad(), emit),
     );
   }
@@ -56,7 +58,6 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       return _onRemoveItem(CartRemoveItem(cartItemId: event.cartItemId), emit);
     }
 
-    // Update state lokal dulu (optimistic update) — tidak ada loading/flicker
     final current = state;
     if (current is CartLoaded) {
       final updatedItems = current.items.map((item) {
@@ -65,10 +66,9 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         }
         return item;
       }).toList();
-      emit(CartLoaded(updatedItems));
+      emit(current.copyWithSelected(items: updatedItems));
     }
 
-    // Sync ke Supabase di background
     final result = await _updateCartQuantity(
       UpdateCartQuantityParams(
         cartItemId: event.cartItemId,
@@ -76,25 +76,56 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       ),
     );
 
-    result.fold(
-      (failure) {
-        // Kalau gagal, fetch ulang untuk kembalikan ke data asli
-        emit(CartError(failure.message));
-      },
-      (_) {}, // sukses, tidak perlu fetch ulang
-    );
+    result.fold((failure) => emit(CartState.error(failure.message)), (_) {});
   }
 
   Future<void> _onRemoveItem(
     CartRemoveItem event,
     Emitter<CartState> emit,
   ) async {
+    final currentSelected = state is CartLoaded
+        ? (state as CartLoaded).selectedIds
+              .where((id) => id != event.cartItemId)
+              .toSet()
+        : <int>{};
+
     final result = await _removeFromCart(
       RemoveFromCartParams(cartItemId: event.cartItemId),
     );
     await result.fold(
-      (failure) async => emit(CartError(failure.message)),
-      (_) async => _onLoad(const CartLoad(), emit),
+      (failure) async => emit(CartState.error(failure.message)),
+      (_) async {
+        final loadResult = await _getCartItems(const NoParams());
+        loadResult.fold(
+          (failure) => emit(CartState.error(failure.message)),
+          (items) => emit(CartState.loaded(items, selectedIds: currentSelected)),
+        );
+      },
     );
+  }
+
+  void _onToggleSelect(CartToggleSelect event, Emitter<CartState> emit) {
+    final current = state;
+    if (current is! CartLoaded) return;
+
+    final newSelected = Set<int>.from(current.selectedIds);
+    if (newSelected.contains(event.cartItemId)) {
+      newSelected.remove(event.cartItemId);
+    } else {
+      newSelected.add(event.cartItemId);
+    }
+
+    emit(current.copyWithSelected(selectedIds: newSelected));
+  }
+
+  void _onSelectAll(CartSelectAll event, Emitter<CartState> emit) {
+    final current = state;
+    if (current is! CartLoaded) return;
+
+    final newSelected = event.selectAll
+        ? current.items.map((e) => e.id).toSet()
+        : <int>{};
+
+    emit(current.copyWithSelected(selectedIds: newSelected));
   }
 }

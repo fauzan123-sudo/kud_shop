@@ -36,9 +36,6 @@ class _CartPageState extends State<CartPage> with RouteAware {
     super.dispose();
   }
 
-  /// Dipanggil setiap kali halaman lain yang ditumpuk di atas
-  /// halaman ini di-pop, dan halaman ini kembali terlihat.
-  /// Contoh: dari Detail Produk -> Beli Sekarang -> balik ke sini.
   @override
   void didPopNext() {
     context.read<CartBloc>().add(const CartLoad());
@@ -83,6 +80,34 @@ class _CartPageState extends State<CartPage> with RouteAware {
 
           return Column(
             children: [
+              Container(
+                color: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Row(
+                  children: [
+                    Checkbox(
+                      value: cartState.isAllSelected,
+                      onChanged: (val) {
+                        context.read<CartBloc>().add(
+                          CartSelectAll(selectAll: val ?? false),
+                        );
+                      },
+                    ),
+                    const Text('Pilih Semua'),
+                    const Spacer(),
+                    if (cartState.selectedIds.isNotEmpty)
+                      Text(
+                        '${cartState.selectedIds.length} dipilih',
+                        style: AppTextStyle.caption.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1),
+
+              // List item
               Expanded(
                 child: ListView.separated(
                   padding: const EdgeInsets.all(16),
@@ -90,25 +115,44 @@ class _CartPageState extends State<CartPage> with RouteAware {
                   separatorBuilder: (_, __) => const SizedBox(height: 8),
                   itemBuilder: (context, index) {
                     final item = cartState.items[index];
-                    return CartItemTile(
-                      item: item,
-                      onQuantityChanged: (newQty) {
-                        context.read<CartBloc>().add(
-                          CartUpdateQuantity(
-                            cartItemId: item.id,
-                            quantity: newQty,
+                    final isSelected = cartState.selectedIds.contains(item.id);
+
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Checkbox(
+                          value: isSelected,
+                          onChanged: (_) {
+                            context.read<CartBloc>().add(
+                              CartToggleSelect(cartItemId: item.id),
+                            );
+                          },
+                        ),
+                        Expanded(
+                          child: CartItemTile(
+                            item: item,
+                            onQuantityChanged: (newQty) {
+                              context.read<CartBloc>().add(
+                                CartUpdateQuantity(
+                                  cartItemId: item.id,
+                                  quantity: newQty,
+                                ),
+                              );
+                            },
+                            onRemove: () {
+                              context.read<CartBloc>().add(
+                                CartRemoveItem(cartItemId: item.id),
+                              );
+                            },
                           ),
-                        );
-                      },
-                      onRemove: () {
-                        context.read<CartBloc>().add(
-                          CartRemoveItem(cartItemId: item.id),
-                        );
-                      },
+                        ),
+                      ],
                     );
                   },
                 ),
               ),
+
+              // Summary bar
               _buildSummaryBar(context, cartState),
             ],
           );
@@ -118,9 +162,10 @@ class _CartPageState extends State<CartPage> with RouteAware {
   }
 
   Widget _buildSummaryBar(BuildContext context, CartLoaded state) {
-    final hasIssue = state.items.any(
+    final hasIssue = state.selectedItems.any(
       (item) => item.isOutOfStock || item.exceedsStock,
     );
+    final hasSelected = state.selectedIds.isNotEmpty;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
@@ -143,24 +188,32 @@ class _CartPageState extends State<CartPage> with RouteAware {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Total (${state.totalQuantity} item)',
+                  hasSelected
+                      ? 'Total (${state.totalQuantity} item)'
+                      : 'Pilih item untuk checkout',
                   style: AppTextStyle.bodyMedium,
                 ),
-                Text(
-                  'Rp ${CurrencyFormatter.format(state.totalPrice)}',
-                  style: AppTextStyle.h3.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
+                if (hasSelected)
+                  Text(
+                    'Rp ${CurrencyFormatter.format(state.totalPrice)}',
+                    style: AppTextStyle.h3.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
-                ),
               ],
             ),
             const SizedBox(height: 12),
             AppButton(
-              label: 'Checkout',
-              onPressed: hasIssue
+              label: hasSelected
+                  ? 'Checkout (${state.selectedItems.length} item)'
+                  : 'Checkout',
+              onPressed: (!hasSelected || hasIssue)
                   ? null
                   : () {
-                      context.push(AppRoutes.customerCheckout);
+                      context.push(
+                        AppRoutes.customerCheckout,
+                        extra: {'items': state.selectedItems},
+                      );
                     },
             ),
             if (hasIssue) ...[

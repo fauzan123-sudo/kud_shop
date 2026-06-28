@@ -1,4 +1,5 @@
 import 'package:kud_shop/core/error/exception.dart';
+import 'package:kud_shop/src/customer/cart/data/models/cart_item_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/cart_item_entity.dart';
 
@@ -43,17 +44,7 @@ class CartSupabaseDataSourceImpl implements CartSupabaseDataSource {
           .order('created_at', ascending: false);
 
       return (response as List).map((json) {
-        final product = json['products'] as Map<String, dynamic>;
-        return CartItemEntity(
-          id: json['id'] as int,
-          productId: json['product_id'] as int,
-          productName: product['name'] as String,
-          productPrice: (product['price'] as num).toDouble(),
-          productImageUrl: product['image_url'] as String?,
-          stock: product['stock'] as int,
-          isActive: product['is_active'] as bool? ?? true,
-          quantity: json['quantity'] as int,
-        );
+        return CartItemModel.fromJson(json as Map<String, dynamic>).toEntity();
       }).toList();
     } catch (e) {
       throw ServerException(message: 'Gagal mengambil data keranjang');

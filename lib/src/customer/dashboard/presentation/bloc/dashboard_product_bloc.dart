@@ -11,7 +11,7 @@ class DashboardProductBloc
 
   DashboardProductBloc({required GetProducts getProducts})
     : _getProducts = getProducts,
-      super(const DashboardProductInitial()) {
+      super(const DashboardProductState.initial()) {
     on<DashboardProductLoad>(_onLoad);
     on<DashboardProductSearchChanged>(_onSearchChanged);
   }
@@ -20,20 +20,20 @@ class DashboardProductBloc
     DashboardProductLoad event,
     Emitter<DashboardProductState> emit,
   ) async {
-    emit(const DashboardProductLoading());
+    emit(const DashboardProductState.loading());
     final result = await _getProducts(const NoParams());
-    result.fold((failure) => emit(DashboardProductError(failure.message)), (
-      products,
-    ) {
-      // Hanya tampilkan produk yang aktif & ada stok untuk customer
-      final available = products.where((p) => p.isActive).toList();
-      emit(
-        DashboardProductLoaded(
-          allProducts: available,
-          filteredProducts: available,
-        ),
-      );
-    });
+    result.fold(
+      (failure) => emit(DashboardProductState.error(failure.message)),
+      (products) {
+        final available = products.where((p) => p.isActive).toList();
+        emit(
+          DashboardProductState.loaded(
+            allProducts: available,
+            filteredProducts: available,
+          ),
+        );
+      },
+    );
   }
 
   void _onSearchChanged(
@@ -44,7 +44,6 @@ class DashboardProductBloc
     if (current is! DashboardProductLoaded) return;
 
     final query = event.query.trim().toLowerCase();
-
     final filtered = query.isEmpty
         ? current.allProducts
         : current.allProducts
@@ -55,5 +54,4 @@ class DashboardProductBloc
   }
 }
 
-// Re-export supaya import-nya tetap rapi di file lain
 typedef ProductEntityList = List<ProductEntity>;

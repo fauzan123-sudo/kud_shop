@@ -1,46 +1,18 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:kud_shop/src/admin/dashboard/data/datasources/admin_dashboard_datasource.dart';
 import 'package:kud_shop/src/admin/dashboard/data/repositories/admin_dashboard_repository.dart';
 
-// ─── Events ───────────────────────────────────────────────────
-abstract class AdminDashboardEvent {
-  const AdminDashboardEvent();
-}
+part 'admin_dashboard_event.dart';
+part 'admin_dashboard_state.dart';
+part 'admin_dashboard_bloc.freezed.dart';
 
-class AdminDashboardLoad extends AdminDashboardEvent {
-  const AdminDashboardLoad();
-}
-
-// ─── States ───────────────────────────────────────────────────
-abstract class AdminDashboardState {
-  const AdminDashboardState();
-}
-
-class AdminDashboardInitial extends AdminDashboardState {
-  const AdminDashboardInitial();
-}
-
-class AdminDashboardLoading extends AdminDashboardState {
-  const AdminDashboardLoading();
-}
-
-class AdminDashboardLoaded extends AdminDashboardState {
-  final DashboardStats stats;
-  const AdminDashboardLoaded(this.stats);
-}
-
-class AdminDashboardError extends AdminDashboardState {
-  final String message;
-  const AdminDashboardError(this.message);
-}
-
-// ─── BLoC ─────────────────────────────────────────────────────
 class AdminDashboardBloc
     extends Bloc<AdminDashboardEvent, AdminDashboardState> {
   final AdminDashboardRepository repository;
 
   AdminDashboardBloc({required this.repository})
-    : super(const AdminDashboardInitial()) {
+    : super(const AdminDashboardState.initial()) {
     on<AdminDashboardLoad>(_onLoad);
   }
 
@@ -48,11 +20,11 @@ class AdminDashboardBloc
     AdminDashboardLoad event,
     Emitter<AdminDashboardState> emit,
   ) async {
-    emit(const AdminDashboardLoading());
+    emit(const AdminDashboardState.loading());
     final result = await repository.getDashboardStats();
     result.fold(
-      (failure) => emit(AdminDashboardError(failure.message)),
-      (stats) => emit(AdminDashboardLoaded(stats)),
+      (failure) => emit(AdminDashboardState.error(failure.message)),
+      (stats) => emit(AdminDashboardState.loaded(stats)),
     );
   }
 }

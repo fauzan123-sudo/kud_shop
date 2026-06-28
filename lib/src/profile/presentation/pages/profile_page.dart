@@ -8,7 +8,6 @@ import 'package:kud_shop/src/auth/domain/entities/user_entity.dart';
 import 'package:kud_shop/src/auth/presentation/bloc/auth_bloc.dart';
 import 'package:kud_shop/src/auth/presentation/bloc/auth_event.dart';
 import 'package:kud_shop/src/auth/presentation/bloc/auth_state.dart';
-import 'package:kud_shop/src/customer/order/presentation/pages/order_list_page.dart';
 import 'package:kud_shop/src/profile/presentation/widget/profile_shimmer.dart';
 import '../widget/profile_header.dart';
 import '../widget/profile_info_card.dart';
@@ -39,7 +38,7 @@ class ProfilePage extends StatelessWidget {
         body: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
             if (state is AuthLoading || state is AuthInitial) {
-              return const ProfileShimmer(); 
+              return const ProfileShimmer();
             }
             if (state is! AuthAuthenticated) {
               return const ProfileShimmer();
@@ -139,12 +138,7 @@ class _ProfileContentState extends State<_ProfileContent> {
             icon: Icons.receipt_long_outlined,
             label: 'Riwayat Pesanan',
             color: Colors.orange,
-            onTap: () {
-              Navigator.of(
-                context,
-                rootNavigator: true,
-              ).push(MaterialPageRoute(builder: (_) => const OrderListPage()));
-            },
+            onTap: () => context.push(AppRoutes.customerOrderHistory),
           ),
           const SizedBox(height: 8),
           const SizedBox(height: 8),

@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:kud_shop/core/error/exception.dart';
 import 'package:kud_shop/core/error/failure.dart';
+import 'package:kud_shop/src/admin/category/data/models/category_model.dart';
 import 'package:kud_shop/src/admin/category/domain/entities/category_entity.dart';
 import 'package:kud_shop/src/admin/category/domain/repositories/category_repository.dart';
 import '../datasources/category_supabase_datasource.dart';

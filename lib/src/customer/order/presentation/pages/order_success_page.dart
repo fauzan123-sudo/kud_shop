@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kud_shop/component/themes/app_text_style.dart';
 import 'package:kud_shop/component/widgets/button/app_button.dart';
+import 'package:kud_shop/core/navigation/app_routes.dart';
 import '../../domain/entities/order_entity.dart';
-import 'order_detail_page.dart';
 
 class OrderSuccessPage extends StatelessWidget {
   final OrderEntity order;
 
   const OrderSuccessPage({super.key, required this.order});
 
-
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
+      onPopInvokedWithResult: (didPop, result) {},
       child: Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
@@ -45,12 +46,7 @@ class OrderSuccessPage extends StatelessWidget {
                 AppButton(
                   label: 'LIHAT DETAIL PESANAN',
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => OrderDetailPage(order: order),
-                      ),
-                    );
+                    context.go(AppRoutes.customerOrderDetail, extra: order);
                   },
                 ),
                 const SizedBox(height: 24),

@@ -50,6 +50,7 @@ import 'package:kud_shop/src/customer/order/domain/repositories/order_repository
 import 'package:kud_shop/src/customer/order/domain/usecases/create_order.dart';
 import 'package:kud_shop/src/customer/order/domain/usecases/get_my_orders.dart';
 import 'package:kud_shop/src/customer/order/domain/usecases/upload_payment_proof.dart';
+import 'package:kud_shop/src/customer/order/presentation/bloc/checkout_bloc.dart';
 import 'package:kud_shop/src/customer/product/presentation/bloc/customer_product_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:kud_shop/src/admin/product/data/datasources/product_supabase_datasource.dart';
@@ -213,4 +214,9 @@ void initDependencies() {
     () => AdminDashboardRepositoryImpl(dataSource: sl()),
   );
   sl.registerFactory(() => AdminDashboardBloc(repository: sl()));
+
+  sl.registerFactory(
+    () =>
+        CheckoutBloc(getCartItems: sl(), getAddresses: sl(), createOrder: sl()),
+  );
 }

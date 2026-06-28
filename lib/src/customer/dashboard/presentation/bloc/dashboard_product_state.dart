@@ -1,42 +1,17 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:kud_shop/src/admin/product/domain/entities/product_entity.dart';
 
-abstract class DashboardProductState {
-  const DashboardProductState();
-}
+part 'dashboard_product_state.freezed.dart';
 
-class DashboardProductInitial extends DashboardProductState {
-  const DashboardProductInitial();
-}
-
-class DashboardProductLoading extends DashboardProductState {
-  const DashboardProductLoading();
-}
-
-class DashboardProductLoaded extends DashboardProductState {
-  final List<ProductEntity> allProducts;
-  final List<ProductEntity> filteredProducts;
-  final String query;
-
-  const DashboardProductLoaded({
-    required this.allProducts,
-    required this.filteredProducts,
-    this.query = '',
-  });
-
-  DashboardProductLoaded copyWith({
-    List<ProductEntity>? allProducts,
-    List<ProductEntity>? filteredProducts,
-    String? query,
-  }) {
-    return DashboardProductLoaded(
-      allProducts: allProducts ?? this.allProducts,
-      filteredProducts: filteredProducts ?? this.filteredProducts,
-      query: query ?? this.query,
-    );
-  }
-}
-
-class DashboardProductError extends DashboardProductState {
-  final String message;
-  const DashboardProductError(this.message);
+@freezed
+abstract class DashboardProductState with _$DashboardProductState {
+  const factory DashboardProductState.initial() = DashboardProductInitial;
+  const factory DashboardProductState.loading() = DashboardProductLoading;
+  const factory DashboardProductState.loaded({
+    required List<ProductEntity> allProducts,
+    required List<ProductEntity> filteredProducts,
+    @Default('') String query,
+  }) = DashboardProductLoaded;
+  const factory DashboardProductState.error(String message) =
+      DashboardProductError;
 }

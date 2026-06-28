@@ -7,7 +7,6 @@ import 'package:kud_shop/src/admin/dashboard/presentation/widget/dashboard_stats
 import 'package:kud_shop/src/admin/dashboard/presentation/widget/dashboard_stock_table.dart';
 import '../bloc/admin_dashboard_bloc.dart';
 
-
 class AdminDashboardPage extends StatelessWidget {
   const AdminDashboardPage({super.key});
 
@@ -32,14 +31,6 @@ class _DashboardView extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
-        // actions: [
-        //   IconButton(
-        //     icon: const Icon(Icons.refresh),
-        //     onPressed: () => context.read<AdminDashboardBloc>().add(
-        //       const AdminDashboardLoad(),
-        //     ),
-        //   ),
-        // ],
       ),
       body: BlocConsumer<AdminDashboardBloc, AdminDashboardState>(
         listener: (context, state) {

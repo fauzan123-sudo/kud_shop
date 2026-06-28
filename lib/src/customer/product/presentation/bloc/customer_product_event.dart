@@ -1,18 +1,12 @@
-abstract class CustomerProductEvent {
-  const CustomerProductEvent();
-}
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class CustomerProductLoad extends CustomerProductEvent {
-  const CustomerProductLoad();
-}
+part 'customer_product_event.freezed.dart';
 
-class CustomerProductSearchChanged extends CustomerProductEvent {
-  final String query;
-  const CustomerProductSearchChanged(this.query);
-}
-
-/// categoryId null artinya "Semua" (tidak ada filter kategori)
-class CustomerProductCategoryChanged extends CustomerProductEvent {
-  final int? categoryId;
-  const CustomerProductCategoryChanged(this.categoryId);
+@freezed
+abstract class CustomerProductEvent with _$CustomerProductEvent {
+  const factory CustomerProductEvent.load() = CustomerProductLoad;
+  const factory CustomerProductEvent.searchChanged(String query) =
+      CustomerProductSearchChanged;
+  const factory CustomerProductEvent.categoryChanged(int? categoryId) =
+      CustomerProductCategoryChanged;
 }

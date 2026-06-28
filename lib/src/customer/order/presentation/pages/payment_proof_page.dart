@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kud_shop/component/themes/app_text_style.dart';
 import 'package:kud_shop/component/widgets/app_snackbar.dart';
 import 'package:kud_shop/component/widgets/button/app_button.dart';
 import 'package:kud_shop/core/injection/injection.dart';
-import 'package:kud_shop/core/navigation/app_routes.dart';
 import 'package:kud_shop/core/utils/currency_formatter.dart';
+import 'package:kud_shop/src/customer/order/presentation/pages/order_success_page.dart';
 import '../../domain/entities/order_entity.dart';
 import '../../domain/usecases/upload_payment_proof.dart';
 
@@ -26,9 +25,9 @@ class _PaymentProofPageState extends State<PaymentProofPage> {
   Uint8List? _imageBytes;
   bool _isUploading = false;
 
-  Future<void> _pickImage() async {
+  Future<void> _pickImage(ImageSource source) async {
     final picked = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
+      source: source,
       maxWidth: 1024,
       maxHeight: 1024,
       imageQuality: 85,
@@ -37,6 +36,40 @@ class _PaymentProofPageState extends State<PaymentProofPage> {
       final bytes = await picked.readAsBytes();
       setState(() => _imageBytes = bytes);
     }
+  }
+
+  void _showImageSourceDialog() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined),
+              title: const Text('Kamera'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Galeri'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
   }
 
   void _onCopyAccountNumber() {
@@ -64,10 +97,13 @@ class _PaymentProofPageState extends State<PaymentProofPage> {
         AppSnackbar.error(context, failure.message);
       },
       (_) {
-        Navigator.of(context).popUntil((route) => route.isFirst);
         if (mounted) {
-          context.go(AppRoutes.customerHome);
-          AppSnackbar.success(context, 'Bukti transfer berhasil dikirim');
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => OrderSuccessPage(order: widget.order),
+            ),
+          );
         }
       },
     );
@@ -141,7 +177,8 @@ class _PaymentProofPageState extends State<PaymentProofPage> {
               children: [
                 const TextSpan(text: 'Silahkan Transfer Sesuai Nominal\n'),
                 TextSpan(
-                  text: 'Rp ${CurrencyFormatter.format(widget.order.totalPrice)}',
+                  text:
+                      'Rp ${CurrencyFormatter.format(widget.order.totalPrice)}',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const TextSpan(
@@ -167,7 +204,7 @@ class _PaymentProofPageState extends State<PaymentProofPage> {
           const Text('Upload Foto Bukti Transfer', style: AppTextStyle.h3),
           const SizedBox(height: 16),
           GestureDetector(
-            onTap: _pickImage,
+            onTap: _showImageSourceDialog,
             child: Container(
               width: double.infinity,
               height: 200,

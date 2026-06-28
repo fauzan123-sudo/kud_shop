@@ -1,12 +1,10 @@
-abstract class DashboardProductEvent {
-  const DashboardProductEvent();
-}
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class DashboardProductLoad extends DashboardProductEvent {
-  const DashboardProductLoad();
-}
+part 'dashboard_product_event.freezed.dart';
 
-class DashboardProductSearchChanged extends DashboardProductEvent {
-  final String query;
-  const DashboardProductSearchChanged(this.query);
+@freezed
+abstract class DashboardProductEvent with _$DashboardProductEvent {
+  const factory DashboardProductEvent.load() = DashboardProductLoad;
+  const factory DashboardProductEvent.searchChanged(String query) =
+      DashboardProductSearchChanged;
 }

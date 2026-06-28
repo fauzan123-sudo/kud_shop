@@ -155,7 +155,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           _buildInfoRow(
             icon: Icons.category_outlined,
             label: 'Kategori',
-            value: _categoryName, // ← sekarang pakai nama kategori
+            value: _categoryName,
           ),
         ],
       ),

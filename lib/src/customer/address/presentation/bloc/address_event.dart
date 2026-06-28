@@ -1,45 +1,22 @@
-abstract class AddressEvent {
-  const AddressEvent();
-}
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class AddressLoad extends AddressEvent {
-  const AddressLoad();
-}
+part 'address_event.freezed.dart';
 
-class AddressCreate extends AddressEvent {
-  final String recipientName;
-  final String phone;
-  final String address;
-  final bool isDefault;
-
-  const AddressCreate({
-    required this.recipientName,
-    required this.phone,
-    required this.address,
-    this.isDefault = false,
-  });
-}
-
-class AddressUpdate extends AddressEvent {
-  final int id;
-  final String recipientName;
-  final String phone;
-  final String address;
-
-  const AddressUpdate({
-    required this.id,
-    required this.recipientName,
-    required this.phone,
-    required this.address,
-  });
-}
-
-class AddressDelete extends AddressEvent {
-  final int id;
-  const AddressDelete({required this.id});
-}
-
-class AddressSetDefault extends AddressEvent {
-  final int id;
-  const AddressSetDefault({required this.id});
+@freezed
+abstract class AddressEvent with _$AddressEvent {
+  const factory AddressEvent.load() = AddressLoad;
+  const factory AddressEvent.create({
+    required String recipientName,
+    required String phone,
+    required String address,
+    @Default(false) bool isDefault,
+  }) = AddressCreate;
+  const factory AddressEvent.update({
+    required int id,
+    required String recipientName,
+    required String phone,
+    required String address,
+  }) = AddressUpdate;
+  const factory AddressEvent.delete({required int id}) = AddressDelete;
+  const factory AddressEvent.setDefault({required int id}) = AddressSetDefault;
 }

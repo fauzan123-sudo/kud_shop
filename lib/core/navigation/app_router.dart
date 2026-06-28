@@ -14,9 +14,11 @@ import 'package:kud_shop/src/customer/cart/presentation/page/cart_page.dart';
 import 'package:kud_shop/src/customer/dashboard/presentation/pages/dashboard_page_customer.dart';
 import 'package:kud_shop/src/customer/order/domain/entities/order_entity.dart';
 import 'package:kud_shop/src/customer/order/presentation/pages/checkout_page.dart';
+import 'package:kud_shop/src/customer/order/presentation/pages/order_detail_page.dart';
+import 'package:kud_shop/src/customer/order/presentation/pages/order_list_page.dart';
 import 'package:kud_shop/src/customer/order/presentation/pages/payment_proof_page.dart';
 import 'package:kud_shop/src/customer/product/presentation/pages/customer_product_page.dart';
-import 'package:kud_shop/src/customer/product_detail/presentation/widget/customer_product_detail_page.dart';
+import 'package:kud_shop/src/customer/product_detail/presentation/pages/customer_product_detail_page.dart';
 import 'package:kud_shop/src/profile/presentation/pages/change_password_page.dart';
 import 'package:kud_shop/src/profile/presentation/pages/profile_edit_page.dart';
 import 'package:kud_shop/src/profile/presentation/pages/profile_page.dart';
@@ -144,12 +146,22 @@ class AppRouter {
         ),
         GoRoute(
           path: AppRoutes.customerCheckout,
-          builder: (_, __) => const CheckoutPage(),
+          builder: (_, state) =>
+              CheckoutPage(buyNowData: state.extra as Map<String, dynamic>?),
         ),
         GoRoute(
           path: AppRoutes.customerPaymentProof,
           builder: (context, state) =>
               PaymentProofPage(order: state.extra as OrderEntity),
+        ),
+        GoRoute(
+          path: AppRoutes.customerOrderHistory,
+          builder: (_, __) => const OrderListPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.customerOrderDetail,
+          builder: (_, state) =>
+              OrderDetailPage(order: state.extra as OrderEntity),
         ),
 
         // ─── Admin Shell (dengan bottom nav) ──────────────────

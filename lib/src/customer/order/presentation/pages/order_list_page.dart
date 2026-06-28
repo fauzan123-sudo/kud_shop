@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kud_shop/component/themes/app_text_style.dart';
 import 'package:kud_shop/component/widgets/app_snackbar.dart';
 import 'package:kud_shop/core/injection/injection.dart';
+import 'package:kud_shop/core/navigation/app_routes.dart';
 import 'package:kud_shop/core/usecases/usecase.dart';
 import 'package:kud_shop/core/utils/currency_formatter.dart';
 import '../../domain/entities/order_entity.dart';
 import '../../domain/usecases/get_my_orders.dart';
-import 'order_detail_page.dart';
 
 class OrderListPage extends StatefulWidget {
   const OrderListPage({super.key});
@@ -48,15 +49,27 @@ class _OrderListPageState extends State<OrderListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-      appBar: AppBar(
-        title: const Text('Riwayat Pesanan'),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go(AppRoutes.customerHome);
+          }
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.grey.shade100,
+        appBar: AppBar(
+          title: const Text('Riwayat Pesanan'),
+          centerTitle: true,
+          backgroundColor: Colors.white,
+          elevation: 0,
+        ),
+        body: _buildBody(),
       ),
-      body: _buildBody(),
     );
   }
 
@@ -112,10 +125,7 @@ class _OrderListPageState extends State<OrderListPage> {
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => OrderDetailPage(order: order)),
-        );
+        context.push(AppRoutes.customerOrderDetail, extra: order);
       },
       child: Container(
         padding: const EdgeInsets.all(12),

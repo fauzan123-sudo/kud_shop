@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 import 'package:kud_shop/core/error/exception.dart';
+import 'package:kud_shop/src/customer/cart/domain/entities/cart_item_entity.dart';
+import 'package:kud_shop/src/customer/order/data/models/order_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/order_entity.dart';
 
@@ -9,12 +11,15 @@ abstract class OrderSupabaseDataSource {
     required String deliveryMethod,
     required String paymentMethod,
     String? notes,
+    bool isBuyNow,
+    int? buyNowProductId,
+    int? buyNowQuantity,
+    List<int> selectedCartItemIds = const [],
+    List<CartItemEntity> cartItems = const [],
   });
 
   Future<List<OrderEntity>> getMyOrders();
-
   Future<OrderEntity> getOrderById(int id);
-
   Future<String> uploadPaymentProof({
     required int orderId,
     required List<int> imageBytes,
@@ -38,34 +43,59 @@ class OrderSupabaseDataSourceImpl implements OrderSupabaseDataSource {
     required String deliveryMethod,
     required String paymentMethod,
     String? notes,
+    bool isBuyNow = false,
+    int? buyNowProductId,
+    int? buyNowQuantity,
+    List<int> selectedCartItemIds = const [],
+    List<CartItemEntity> cartItems = const [],
   }) async {
     try {
-      // 1. Ambil alamat (untuk simpan snapshot nama & telepon penerima)
+      // 1. Ambil alamat
       final addressData = await supabase
           .from('addresses')
           .select('recipient_name, phone, address')
           .eq('id', addressId)
           .single();
 
-      // 2. Ambil semua item di cart user ini, sekaligus data produk terkini
-      final cartResponse = await supabase
-          .from('cart_items')
-          .select('''
-            id,
-            quantity,
-            product_id,
-            products ( id, name, price, stock )
-          ''')
-          .eq('user_id', _userId);
+      // 2. Gunakan cartItems dari state atau ambil dari Supabase
+      List<Map<String, dynamic>> cartItemsData;
+      if (cartItems.isNotEmpty) {
+        cartItemsData = cartItems
+            .map(
+              (item) => {
+                'id': item.id,
+                'quantity': item.quantity,
+                'product_id': item.productId,
+                'products': {
+                  'id': item.productId,
+                  'name': item.productName,
+                  'price': item.productPrice,
+                  'stock': item.stock,
+                },
+              },
+            )
+            .toList();
+      } else {
+        final cartQuery = supabase
+            .from('cart_items')
+            .select(
+              'id, quantity, product_id, products ( id, name, price, stock )',
+            )
+            .eq('user_id', _userId);
 
-      final cartItems = cartResponse as List;
+        final cartResponse = selectedCartItemIds.isNotEmpty
+            ? await cartQuery.inFilter('id', selectedCartItemIds)
+            : await cartQuery;
 
-      if (cartItems.isEmpty) {
+        cartItemsData = (cartResponse as List).cast<Map<String, dynamic>>();
+      }
+
+      if (cartItemsData.isEmpty) {
         throw ServerException(message: 'Keranjang kosong, tidak bisa checkout');
       }
 
-      // 3. Validasi stok sebelum membuat order
-      for (final item in cartItems) {
+      // 3. Validasi stok
+      for (final item in cartItemsData) {
         final product = item['products'] as Map<String, dynamic>;
         final stock = product['stock'] as int;
         final qty = item['quantity'] as int;
@@ -78,7 +108,7 @@ class OrderSupabaseDataSourceImpl implements OrderSupabaseDataSource {
 
       // 4. Hitung total harga
       double totalPrice = 0;
-      for (final item in cartItems) {
+      for (final item in cartItemsData) {
         final product = item['products'] as Map<String, dynamic>;
         final price = (product['price'] as num).toDouble();
         final qty = item['quantity'] as int;
@@ -102,8 +132,8 @@ class OrderSupabaseDataSourceImpl implements OrderSupabaseDataSource {
 
       final orderId = orderResponse['id'] as int;
 
-      // 6. Insert semua order_items (snapshot data produk saat ini)
-      final orderItemsPayload = cartItems.map((item) {
+      // 6. Insert order_items
+      final orderItemsPayload = cartItemsData.map((item) {
         final product = item['products'] as Map<String, dynamic>;
         final price = (product['price'] as num).toDouble();
         final qty = item['quantity'] as int;
@@ -119,8 +149,8 @@ class OrderSupabaseDataSourceImpl implements OrderSupabaseDataSource {
 
       await supabase.from('order_items').insert(orderItemsPayload);
 
-      // 7. Kurangi stok produk sesuai quantity yang dipesan
-      for (final item in cartItems) {
+      // 7. Kurangi stok produk
+      for (final item in cartItemsData) {
         final product = item['products'] as Map<String, dynamic>;
         final stock = product['stock'] as int;
         final qty = item['quantity'] as int;
@@ -130,10 +160,17 @@ class OrderSupabaseDataSourceImpl implements OrderSupabaseDataSource {
             .eq('id', item['product_id']);
       }
 
-      // 8. Kosongkan cart user ini
-      await supabase.from('cart_items').delete().eq('user_id', _userId);
+      // 8. Hapus item cart yang dipesan
+      if (selectedCartItemIds.isNotEmpty) {
+        await supabase
+            .from('cart_items')
+            .delete()
+            .inFilter('id', selectedCartItemIds);
+      } else {
+        await supabase.from('cart_items').delete().eq('user_id', _userId);
+      }
 
-      // 9. Susun OrderEntity untuk dikembalikan
+      // 9. Susun OrderEntity
       final orderItems = orderItemsPayload.map((data) {
         return OrderItemEntity(
           id: 0,
@@ -170,14 +207,8 @@ class OrderSupabaseDataSourceImpl implements OrderSupabaseDataSource {
       final response = await supabase
           .from('orders')
           .select('''
-            id,
-            total_price,
-            delivery_method,
-            payment_method,
-            payment_proof_url,
-            status,
-            notes,
-            created_at,
+            id, total_price, delivery_method, payment_method,
+            payment_proof_url, status, notes, created_at,
             addresses ( recipient_name, phone, address ),
             order_items ( id, product_id, product_name, product_price, quantity, subtotal )
           ''')
@@ -198,14 +229,8 @@ class OrderSupabaseDataSourceImpl implements OrderSupabaseDataSource {
       final response = await supabase
           .from('orders')
           .select('''
-            id,
-            total_price,
-            delivery_method,
-            payment_method,
-            payment_proof_url,
-            status,
-            notes,
-            created_at,
+            id, total_price, delivery_method, payment_method,
+            payment_proof_url, status, notes, created_at,
             addresses ( recipient_name, phone, address ),
             order_items ( id, product_id, product_name, product_price, quantity, subtotal )
           ''')
@@ -248,31 +273,6 @@ class OrderSupabaseDataSourceImpl implements OrderSupabaseDataSource {
   }
 
   OrderEntity _fromJson(Map<String, dynamic> json) {
-    final address = json['addresses'] as Map<String, dynamic>?;
-    final itemsJson = json['order_items'] as List;
-
-    return OrderEntity(
-      id: json['id'] as int,
-      totalPrice: (json['total_price'] as num).toDouble(),
-      deliveryMethod: json['delivery_method'] as String,
-      paymentMethod: json['payment_method'] as String,
-      paymentProofUrl: json['payment_proof_url'] as String?,
-      status: json['status'] as String,
-      notes: json['notes'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      recipientName: address?['recipient_name'] as String? ?? '-',
-      recipientPhone: address?['phone'] as String? ?? '-',
-      recipientAddress: address?['address'] as String?,
-      items: itemsJson.map((item) {
-        return OrderItemEntity(
-          id: item['id'] as int,
-          productId: item['product_id'] as int,
-          productName: item['product_name'] as String,
-          productPrice: (item['product_price'] as num).toDouble(),
-          quantity: item['quantity'] as int,
-          subtotal: (item['subtotal'] as num).toDouble(),
-        );
-      }).toList(),
-    );
+    return OrderModel.fromJson(json).toEntity();
   }
 }

@@ -5,15 +5,20 @@ import 'package:kud_shop/src/customer/cart/domain/entities/cart_item_entity.dart
 
 class CheckoutSummaryItem extends StatelessWidget {
   final CartItemEntity item;
+  final ValueChanged<int>? onQuantityChanged;
 
-  const CheckoutSummaryItem({super.key, required this.item});
+  const CheckoutSummaryItem({
+    super.key,
+    required this.item,
+    this.onQuantityChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
@@ -42,11 +47,15 @@ class CheckoutSummaryItem extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${item.quantity} x Rp ${CurrencyFormatter.format(item.productPrice)}',
+                  'Rp ${CurrencyFormatter.format(item.productPrice)}',
                   style: AppTextStyle.bodySmall.copyWith(
                     color: Colors.grey.shade600,
                   ),
                 ),
+                if (onQuantityChanged != null) ...[
+                  const SizedBox(height: 6),
+                  _buildStepper(),
+                ],
               ],
             ),
           ),
@@ -61,6 +70,35 @@ class CheckoutSummaryItem extends StatelessWidget {
     );
   }
 
+  Widget _buildStepper() {
+    return Row(
+      children: [
+        _StepperButton(
+          icon: Icons.remove,
+          onTap: item.quantity <= 1
+              ? null
+              : () => onQuantityChanged!(item.quantity - 1),
+        ),
+        Container(
+          width: 32,
+          alignment: Alignment.center,
+          child: Text(
+            '${item.quantity}',
+            style: AppTextStyle.bodyMedium.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        _StepperButton(
+          icon: Icons.add,
+          onTap: item.quantity >= item.stock
+              ? null
+              : () => onQuantityChanged!(item.quantity + 1),
+        ),
+      ],
+    );
+  }
+
   Widget _buildPlaceholder() {
     return Container(
       width: 48,
@@ -70,6 +108,37 @@ class CheckoutSummaryItem extends StatelessWidget {
         Icons.medication_outlined,
         size: 20,
         color: Colors.grey.shade400,
+      ),
+    );
+  }
+}
+
+class _StepperButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  const _StepperButton({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDisabled = onTap == null;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        width: 24,
+        height: 24,
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isDisabled ? Colors.grey.shade200 : Colors.grey.shade300,
+          ),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Icon(
+          icon,
+          size: 14,
+          color: isDisabled ? Colors.grey.shade300 : Colors.grey.shade700,
+        ),
       ),
     );
   }

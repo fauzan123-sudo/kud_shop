@@ -1,42 +1,27 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:kud_shop/src/admin/category/domain/entities/category_entity.dart';
 
-class CategoryModel {
-  final int id;
-  final String name;
-  final String? iconUrl;
-  final DateTime createdAt;
+part 'category_model.freezed.dart';
+part 'category_model.g.dart';
 
-  const CategoryModel({
-    required this.id,
-    required this.name,
-    this.iconUrl,
-    required this.createdAt,
-  });
+@freezed
+abstract class CategoryModel with _$CategoryModel {
+  const factory CategoryModel({
+    required int id,
+    required String name,
+    @JsonKey(name: 'icon_url') String? iconUrl,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+  }) = _CategoryModel;
 
-  factory CategoryModel.fromJson(Map<String, dynamic> json) {
-    return CategoryModel(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      iconUrl: json['icon_url'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
-    );
-  }
+  factory CategoryModel.fromJson(Map<String, dynamic> json) =>
+      _$CategoryModelFromJson(json);
+}
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'icon_url': iconUrl,
-      'created_at': createdAt.toIso8601String(),
-    };
-  }
-
-  CategoryEntity toEntity() {
-    return CategoryEntity(
-      id: id,
-      name: name,
-      iconUrl: iconUrl,
-      createdAt: createdAt,
-    );
-  }
+extension CategoryModelX on CategoryModel {
+  CategoryEntity toEntity() => CategoryEntity(
+        id: id,
+        name: name,
+        iconUrl: iconUrl,
+        createdAt: createdAt,
+      );
 }

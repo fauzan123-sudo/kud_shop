@@ -1,140 +1,97 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kud_shop/component/themes/app_text_style.dart';
 import 'package:kud_shop/component/widgets/app_snackbar.dart';
 import 'package:kud_shop/component/widgets/button/app_button.dart';
-import 'package:kud_shop/component/widgets/loading/loading_widget.dart';
 import 'package:kud_shop/core/injection/injection.dart';
-import 'package:kud_shop/core/usecases/usecase.dart';
 import 'package:kud_shop/core/utils/currency_formatter.dart';
+import 'package:kud_shop/src/admin/product/domain/entities/product_entity.dart';
 import 'package:kud_shop/src/customer/address/domain/entities/address_entity.dart';
-import 'package:kud_shop/src/customer/address/domain/usecases/get_addresses.dart';
 import 'package:kud_shop/src/customer/address/presentation/pages/address_list_page.dart';
 import 'package:kud_shop/src/customer/cart/domain/entities/cart_item_entity.dart';
-import 'package:kud_shop/src/customer/cart/domain/usecases/get_cart_items.dart';
-import 'package:kud_shop/src/customer/order/presentation/pages/checkout_summary_item.dart';
+import 'package:kud_shop/src/customer/order/presentation/bloc/checkout_bloc.dart';
+import 'package:kud_shop/src/customer/order/presentation/bloc/checkout_event.dart';
+import 'package:kud_shop/src/customer/order/presentation/bloc/checkout_state.dart';
+import 'package:kud_shop/src/customer/order/presentation/pages/order_success_page.dart';
 import 'package:kud_shop/src/customer/order/presentation/pages/payment_proof_page.dart';
-import '../../domain/usecases/create_order.dart';
 import '../widget/checkout_summary_item.dart';
 
-class CheckoutPage extends StatefulWidget {
-  const CheckoutPage({super.key});
+class CheckoutPage extends StatelessWidget {
+  final Map<String, dynamic>? buyNowData;
+
+  const CheckoutPage({super.key, this.buyNowData});
+
+  bool get isBuyNow =>
+      buyNowData != null && buyNowData!.containsKey('isBuyNow');
 
   @override
-  State<CheckoutPage> createState() => _CheckoutPageState();
-}
-
-class _CheckoutPageState extends State<CheckoutPage> {
-  static const double _shippingFee = 10000;
-  static const String _bankAccountNumber = '09928-2881-98-0021';
-
-  bool _isLoadingInitial = true;
-  bool _isSubmitting = false;
-  String? _loadError;
-
-  List<CartItemEntity>? _cartItems;
-  AddressEntity? _selectedAddress;
-  String _deliveryMethod = 'pickup';
-  String _paymentMethod = 'transfer';
-
-  @override
-  void initState() {
-    super.initState();
-    _loadInitialData();
-  }
-
-  Future<void> _loadInitialData() async {
-    setState(() => _isLoadingInitial = true);
-
-    final cartResult = await sl<GetCartItems>()(const NoParams());
-    final addressResult = await sl<GetAddresses>()(const NoParams());
-
-    if (!mounted) return;
-
-    cartResult.fold(
-      (failure) => setState(() => _loadError = failure.message),
-      (items) => setState(() => _cartItems = items),
-    );
-
-    addressResult.fold((failure) {}, (addresses) {
-      if (addresses.isNotEmpty) {
-        final defaultAddr = addresses.firstWhere(
-          (a) => a.isDefault,
-          orElse: () => addresses.first,
-        );
-        setState(() => _selectedAddress = defaultAddr);
-      }
-    });
-
-    setState(() => _isLoadingInitial = false);
-  }
-
-  Future<void> _onPickAddress() async {
-    final result = await Navigator.push<AddressEntity>(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const AddressListPage(isSelectionMode: true),
-      ),
-    );
-    if (result != null) {
-      setState(() => _selectedAddress = result);
-    }
-  }
-
-  double get _subtotal {
-    if (_cartItems == null) return 0;
-    return _cartItems!.fold(0, (sum, item) => sum + item.subtotal);
-  }
-
-  double get _shippingCost => _deliveryMethod == 'delivery' ? _shippingFee : 0;
-
-  double get _totalPrice => _subtotal + _shippingCost;
-
-  Future<void> _onSubmitOrder() async {
-    if (_selectedAddress == null) {
-      AppSnackbar.error(context, 'Pilih alamat pengiriman terlebih dahulu');
-      return;
-    }
-
-    setState(() => _isSubmitting = true);
-
-    final result = await sl<CreateOrder>()(
-      CreateOrderParams(
-        addressId: _selectedAddress!.id,
-        deliveryMethod: _deliveryMethod,
-        paymentMethod: _paymentMethod,
-      ),
-    );
-
-    if (!mounted) return;
-
-    result.fold(
-      (failure) {
-        setState(() => _isSubmitting = false);
-        AppSnackbar.error(context, failure.message);
-      },
-      (order) {
-        // context.read<CartBloc>().add(const CartLoad());
-
-        if (_paymentMethod == 'transfer') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => PaymentProofPage(order: order)),
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) {
+        final bloc = sl<CheckoutBloc>();
+        if (isBuyNow) {
+          bloc.add(
+            CheckoutBuyNow(
+              // ← ini masih sama karena nama class sama
+              product: buyNowData!['product'] as ProductEntity,
+              quantity: buyNowData!['quantity'] as int,
+            ),
+          );
+        } else if (buyNowData != null && buyNowData!.containsKey('items')) {
+          bloc.add(
+            CheckoutLoadFromItems(
+              items: buyNowData!['items'] as List<CartItemEntity>,
+            ),
           );
         } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => OrderSuccessPage(order: order)),
-          );
+          bloc.add(const CheckoutLoad());
         }
+        return bloc;
       },
+      child: BlocConsumer<CheckoutBloc, CheckoutState>(
+        listener: (context, state) {
+          if (state is CheckoutSuccess) {
+            if (state.order.paymentMethod == 'transfer') {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PaymentProofPage(order: state.order),
+                ),
+              );
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => OrderSuccessPage(order: state.order),
+                ),
+              );
+            }
+          }
+          if (state is CheckoutError) {
+            AppSnackbar.error(context, state.message);
+          }
+        },
+        builder: (context, state) {
+          if (state is CheckoutLoading || state is CheckoutInitial) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          if (state is! CheckoutLoaded) return const SizedBox();
+
+          return _CheckoutView(state: state);
+        },
+      ),
     );
   }
+}
 
-  void _onCopyAccountNumber() {
-    Clipboard.setData(const ClipboardData(text: _bankAccountNumber));
-    AppSnackbar.success(context, 'Nomor rekening disalin');
-  }
+// ─── View terpisah ────────────────────────────────────────────
+class _CheckoutView extends StatelessWidget {
+  final CheckoutLoaded state;
+
+  const _CheckoutView({required this.state});
 
   @override
   Widget build(BuildContext context) {
@@ -146,192 +103,211 @@ class _CheckoutPageState extends State<CheckoutPage> {
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      body: _buildBody(),
-      bottomNavigationBar: _isLoadingInitial || _loadError != null
-          ? null
-          : _buildBottomBar(),
-    );
-  }
-
-  Widget _buildBody() {
-    if (_isLoadingInitial) {
-      return const LoadingWidget();
-    }
-
-    if (_loadError != null) {
-      return Center(
-        child: Text(
-          _loadError!,
-          style: AppTextStyle.bodyMedium.copyWith(color: Colors.grey),
-        ),
-      );
-    }
-
-    if (_cartItems == null || _cartItems!.isEmpty) {
-      return Center(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.shopping_cart_outlined,
-              size: 64,
-              color: Colors.grey.shade400,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Keranjang kamu kosong',
-              style: AppTextStyle.bodyMedium.copyWith(
-                color: Colors.grey.shade600,
-              ),
-            ),
+            // Alamat
+            _buildAddressSection(context),
+            const SizedBox(height: 12),
+
+            // Produk
+            _buildProductSection(context),
+            const SizedBox(height: 12),
+
+            // Metode pengiriman
+            _buildDeliverySection(context),
+            const SizedBox(height: 12),
+
+            // Metode pembayaran
+            _buildPaymentSection(context),
+            const SizedBox(height: 100),
           ],
         ),
-      );
-    }
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionCard(
-            title: 'Alamat Pengiriman',
-            trailing: TextButton(
-              onPressed: _onPickAddress,
-              child: Text(_selectedAddress == null ? 'Pilih' : 'Ganti'),
-            ),
-            child: _selectedAddress == null
-                ? Text(
-                    'Belum ada alamat dipilih',
-                    style: AppTextStyle.bodySmall.copyWith(
-                      color: Colors.red.shade600,
-                    ),
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _selectedAddress!.recipientName,
-                        style: AppTextStyle.label,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _selectedAddress!.phone,
-                        style: AppTextStyle.bodySmall.copyWith(
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _selectedAddress!.address,
-                        style: AppTextStyle.bodySmall,
-                      ),
-                    ],
-                  ),
-          ),
-          const SizedBox(height: 12),
-
-          _buildSectionCard(
-            title: 'Pesanan (${_cartItems!.length} produk)',
-            child: Column(
-              children: _cartItems!
-                  .map((item) => CheckoutSummaryItem(item: item))
-                  .toList(),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          _buildSectionCard(
-            title: 'Metode Pengiriman',
-            child: Column(
-              children: [
-                _buildRadioOption(
-                  label: 'Ambil di tempat (Pickup)',
-                  subtitle: 'Gratis',
-                  value: 'pickup',
-                  groupValue: _deliveryMethod,
-                  onChanged: (v) => setState(() => _deliveryMethod = v!),
-                ),
-                _buildRadioOption(
-                  label: 'Diantar (Delivery)',
-                  subtitle:
-                      'Biaya kirim Rp ${CurrencyFormatter.format(_shippingFee)}',
-                  value: 'delivery',
-                  groupValue: _deliveryMethod,
-                  onChanged: (v) => setState(() => _deliveryMethod = v!),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          _buildSectionCard(
-            title: 'Metode Pembayaran',
-            child: Column(
-              children: [
-                _buildRadioOption(
-                  label: 'Transfer Bank',
-                  value: 'transfer',
-                  groupValue: _paymentMethod,
-                  onChanged: (v) => setState(() => _paymentMethod = v!),
-                ),
-                if (_paymentMethod == 'transfer') _buildBankAccountInfo(),
-                _buildRadioOption(
-                  label: 'Bayar di Tempat (COD)',
-                  value: 'cod',
-                  groupValue: _paymentMethod,
-                  onChanged: (v) => setState(() => _paymentMethod = v!),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 100),
-        ],
       ),
+      bottomNavigationBar: _buildBottomBar(context),
     );
   }
 
-  Widget _buildBankAccountInfo() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.blue.shade50,
-        borderRadius: BorderRadius.circular(8),
+  Widget _buildAddressSection(BuildContext context) {
+    return _buildSectionCard(
+      title: 'Alamat Pengiriman',
+      trailing: TextButton(
+        onPressed: () async {
+          final selected = await Navigator.push<AddressEntity>(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const AddressListPage(isSelectionMode: true),
+            ),
+          );
+          if (selected != null && context.mounted) {
+            context.read<CheckoutBloc>().add(CheckoutAddressSelected(selected));
+          }
+        },
+        child: Text(state.selectedAddress == null ? 'Pilih' : 'Ganti'),
       ),
-      child: Row(
-        children: [
-          Icon(Icons.account_balance, size: 18, color: Colors.blue.shade700),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
+      child: state.selectedAddress == null
+          ? Text(
+              'Belum ada alamat dipilih',
+              style: AppTextStyle.bodySmall.copyWith(
+                color: Colors.red.shade600,
+              ),
+            )
+          : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'No. Rekening',
-                  style: AppTextStyle.caption.copyWith(
+                  state.selectedAddress!.recipientName,
+                  style: AppTextStyle.label,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  state.selectedAddress!.phone,
+                  style: AppTextStyle.bodySmall.copyWith(
                     color: Colors.grey.shade600,
                   ),
                 ),
+                const SizedBox(height: 2),
                 Text(
-                  _bankAccountNumber,
-                  style: AppTextStyle.bodyMedium.copyWith(
-                    fontWeight: FontWeight.w600,
+                  state.selectedAddress!.address,
+                  style: AppTextStyle.bodySmall,
+                ),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildProductSection(BuildContext context) {
+    return _buildSectionCard(
+      title: 'Pesanan (${state.items.length} produk)',
+      child: Column(
+        children: state.items
+            .map(
+              (item) => CheckoutSummaryItem(
+                item: item,
+                onQuantityChanged: (newQty) {
+                  context.read<CheckoutBloc>().add(
+                    CheckoutQuantityChanged(
+                      cartItemId: item.id,
+                      quantity: newQty,
+                    ),
+                  );
+                },
+              ),
+            )
+            .toList(),
+      ),
+    );
+  }
+
+  Widget _buildDeliverySection(BuildContext context) {
+    return _buildSectionCard(
+      title: 'Metode Pengiriman',
+      child: RadioGroup<String>(
+        groupValue: state.deliveryMethod,
+        onChanged: (v) =>
+            context.read<CheckoutBloc>().add(CheckoutDeliveryMethodChanged(v!)),
+        child: Column(
+          children: [
+            _buildRadioOption(
+              label: 'Ambil di tempat (Pickup)',
+              subtitle: 'Gratis',
+              value: 'pickup',
+            ),
+            _buildRadioOption(
+              label: 'Diantar (Delivery)',
+              subtitle: 'Biaya kirim Rp 10.000',
+              value: 'delivery',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentSection(BuildContext context) {
+    return _buildSectionCard(
+      title: 'Metode Pembayaran',
+      child: RadioGroup<String>(
+        groupValue: state.paymentMethod,
+        onChanged: (v) =>
+            context.read<CheckoutBloc>().add(CheckoutPaymentMethodChanged(v!)),
+        child: Column(
+          children: [
+            _buildRadioOption(label: 'Transfer Bank', value: 'transfer'),
+            _buildRadioOption(label: 'Bayar di Tempat (COD)', value: 'cod'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomBar(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(15),
+            blurRadius: 12,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Subtotal', style: AppTextStyle.bodySmall),
+                Text(
+                  'Rp ${CurrencyFormatter.format(state.subtotal)}',
+                  style: AppTextStyle.bodySmall,
+                ),
+              ],
+            ),
+            if (state.shippingCost > 0) ...[
+              const SizedBox(height: 4),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Ongkos Kirim', style: AppTextStyle.bodySmall),
+                  Text(
+                    'Rp ${CurrencyFormatter.format(state.shippingCost)}',
+                    style: AppTextStyle.bodySmall,
+                  ),
+                ],
+              ),
+            ],
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Total Pembayaran', style: AppTextStyle.bodyMedium),
+                Text(
+                  'Rp ${CurrencyFormatter.format(state.totalPrice)}',
+                  style: AppTextStyle.h3.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ],
             ),
-          ),
-          TextButton.icon(
-            onPressed: _onCopyAccountNumber,
-            icon: const Icon(Icons.copy, size: 14),
-            label: const Text('Copy', style: TextStyle(fontSize: 12)),
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              minimumSize: const Size(0, 32),
+            const SizedBox(height: 12),
+            AppButton(
+              label: 'Buat Pesanan',
+              isLoading: state.isSubmitting,
+              onPressed: state.selectedAddress == null || state.isSubmitting
+                  ? null
+                  : () => context.read<CheckoutBloc>().add(
+                      const CheckoutSubmit(),
+                    ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -376,16 +352,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
     required String label,
     String? subtitle,
     required String value,
-    required String groupValue,
-    required ValueChanged<String?> onChanged,
   }) {
-    // ignore: deprecated_member_use
     return RadioListTile<String>(
       value: value,
-      // ignore: deprecated_member_use
-      groupValue: groupValue,
-      // ignore: deprecated_member_use
-      onChanged: onChanged,
       title: Text(label, style: AppTextStyle.bodyMedium),
       subtitle: subtitle != null
           ? Text(
@@ -395,77 +364,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
           : null,
       contentPadding: EdgeInsets.zero,
       dense: true,
-    );
-  }
-
-  Widget _buildBottomBar() {
-    final canSubmit =
-        !_isSubmitting &&
-        (_cartItems?.isNotEmpty ?? false) &&
-        _selectedAddress != null;
-
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(15),
-            blurRadius: 12,
-            offset: const Offset(0, -4),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Subtotal', style: AppTextStyle.bodySmall),
-                Text(
-                  'Rp ${CurrencyFormatter.format(_subtotal)}',
-                  style: AppTextStyle.bodySmall,
-                ),
-              ],
-            ),
-            if (_shippingCost > 0) ...[
-              const SizedBox(height: 4),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Ongkos Kirim', style: AppTextStyle.bodySmall),
-                  Text(
-                    'Rp ${CurrencyFormatter.format(_shippingCost)}',
-                    style: AppTextStyle.bodySmall,
-                  ),
-                ],
-              ),
-            ],
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Total Pembayaran', style: AppTextStyle.bodyMedium),
-                Text(
-                  'Rp ${CurrencyFormatter.format(_totalPrice)}',
-                  style: AppTextStyle.h3.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            AppButton(
-              label: 'Buat Pesanan',
-              isLoading: _isSubmitting,
-              onPressed: canSubmit ? _onSubmitOrder : null,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

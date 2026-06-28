@@ -110,7 +110,11 @@ class CartItemTile extends StatelessWidget {
       children: [
         _StepperButton(
           icon: Icons.remove,
-          onTap: () => onQuantityChanged(item.quantity - 1),
+          onTap:
+              item.quantity <=
+                  1
+              ? null
+              : () => onQuantityChanged(item.quantity - 1),
         ),
         Container(
           width: 36,

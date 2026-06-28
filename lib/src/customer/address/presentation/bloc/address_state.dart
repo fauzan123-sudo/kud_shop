@@ -1,33 +1,20 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/entities/address_entity.dart';
 
-abstract class AddressState {
-  const AddressState();
+part 'address_state.freezed.dart';
+
+@freezed
+abstract class AddressState with _$AddressState {
+  const factory AddressState.initial() = AddressInitial;
+  const factory AddressState.loading() = AddressLoading;
+  const factory AddressState.loaded(List<AddressEntity> addresses) = AddressLoaded;
+  const factory AddressState.actionSuccess(
+    List<AddressEntity> addresses,
+    String message,
+  ) = AddressActionSuccess;
+  const factory AddressState.error(String message) = AddressError;
 }
 
-class AddressInitial extends AddressState {
-  const AddressInitial();
-}
-
-class AddressLoading extends AddressState {
-  const AddressLoading();
-}
-
-class AddressLoaded extends AddressState {
-  final List<AddressEntity> addresses;
-
-  const AddressLoaded(this.addresses);
-
+extension AddressLoadedX on AddressLoaded {
   bool get isEmpty => addresses.isEmpty;
-}
-
-class AddressActionSuccess extends AddressState {
-  final List<AddressEntity> addresses;
-  final String message;
-
-  const AddressActionSuccess(this.addresses, this.message);
-}
-
-class AddressError extends AddressState {
-  final String message;
-  const AddressError(this.message);
 }

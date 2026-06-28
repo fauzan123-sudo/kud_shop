@@ -17,7 +17,7 @@ class CustomerProductBloc
     required GetCategories getCategories,
   })  : _getProducts = getProducts,
         _getCategories = getCategories,
-        super(const CustomerProductInitial()) {
+        super(const CustomerProductState.initial()) {
     on<CustomerProductLoad>(_onLoad);
     on<CustomerProductSearchChanged>(_onSearchChanged);
     on<CustomerProductCategoryChanged>(_onCategoryChanged);
@@ -27,12 +27,12 @@ class CustomerProductBloc
     CustomerProductLoad event,
     Emitter<CustomerProductState> emit,
   ) async {
-    emit(const CustomerProductLoading());
+    emit(const CustomerProductState.loading());
 
     final productsResult = await _getProducts(const NoParams());
 
     await productsResult.fold(
-      (failure) async => emit(CustomerProductError(failure.message)),
+      (failure) async => emit(CustomerProductState.error(failure.message)),
       (products) async {
         final categoriesResult = await _getCategories(const NoParams());
         final categories = categoriesResult.fold(
@@ -42,13 +42,11 @@ class CustomerProductBloc
 
         final available = products.where((p) => p.isActive).toList();
 
-        emit(
-          CustomerProductLoaded(
-            allProducts: available,
-            filteredProducts: available,
-            categories: categories,
-          ),
-        );
+        emit(CustomerProductState.loaded(
+          allProducts: available,
+          filteredProducts: available,
+          categories: categories,
+        ));
       },
     );
   }
@@ -82,13 +80,10 @@ class CustomerProductBloc
       categoryId: event.categoryId,
     );
 
-    emit(
-      current.copyWith(
-        filteredProducts: filtered,
-        selectedCategoryId: event.categoryId,
-        clearCategory: event.categoryId == null,
-      ),
-    );
+    emit(current.copyWith(
+      filteredProducts: filtered,
+      selectedCategoryId: event.categoryId,
+    ));
   }
 
   List<ProductEntity> _applyFilters({
