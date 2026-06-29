@@ -56,34 +56,42 @@ class _CustomerProductView extends StatelessWidget {
 
           final loaded = state as CustomerProductLoaded;
 
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                child: Column(
-                  children: [
-                    ProductSearchBar(
-                      onChanged: (query) {
-                        context.read<CustomerProductBloc>().add(
-                              CustomerProductSearchChanged(query),
-                            );
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    CategoryFilterChips(
-                      categories: loaded.categories,
-                      selectedCategoryId: loaded.selectedCategoryId,
-                      onSelected: (categoryId) {
-                        context.read<CustomerProductBloc>().add(
-                              CustomerProductCategoryChanged(categoryId),
-                            );
-                      },
-                    ),
-                  ],
+          return RefreshIndicator(
+            // ← tambah ini
+            onRefresh: () async {
+              context.read<CustomerProductBloc>().add(
+                const CustomerProductLoad(),
+              );
+            },
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                  child: Column(
+                    children: [
+                      ProductSearchBar(
+                        onChanged: (query) {
+                          context.read<CustomerProductBloc>().add(
+                            CustomerProductSearchChanged(query),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      CategoryFilterChips(
+                        categories: loaded.categories,
+                        selectedCategoryId: loaded.selectedCategoryId,
+                        onSelected: (categoryId) {
+                          context.read<CustomerProductBloc>().add(
+                            CustomerProductCategoryChanged(categoryId),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Expanded(child: _buildProductGrid(context, loaded)),
-            ],
+                Expanded(child: _buildProductGrid(context, loaded)),
+              ],
+            ),
           );
         },
       ),
@@ -123,10 +131,7 @@ class _CustomerProductView extends StatelessWidget {
         return CustomerProductCard(
           product: product,
           onTap: () {
-            context.push(
-              AppRoutes.customerProductDetail,
-              extra: product,
-            );
+            context.push(AppRoutes.customerProductDetail, extra: product);
           },
         );
       },

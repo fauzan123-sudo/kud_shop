@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kud_shop/component/themes/app_text_style.dart';
 import 'package:kud_shop/component/widgets/app_snackbar.dart';
 import 'package:kud_shop/core/injection/injection.dart';
+import 'package:kud_shop/core/navigation/app_routes.dart';
 import 'package:kud_shop/core/utils/currency_formatter.dart';
 import 'package:kud_shop/src/customer/order/domain/entities/order_entity.dart';
 import '../bloc/admin_order_bloc.dart';
-import 'admin_order_detail_page.dart';
 
 class AdminOrderPage extends StatelessWidget {
   const AdminOrderPage({super.key});
@@ -141,15 +142,7 @@ class _OrderCard extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider.value(
-              value: context.read<AdminOrderBloc>(),
-              child: AdminOrderDetailPage(order: order),
-            ),
-          ),
-        );
+        context.push(AppRoutes.adminOrderDetail, extra: order);
       },
       child: Container(
         padding: const EdgeInsets.all(14),

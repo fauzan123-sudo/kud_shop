@@ -4,10 +4,14 @@ import 'package:flutter/services.dart';
 class AppTheme {
   static ThemeData get lightTheme => ThemeData(
     useMaterial3: true,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: Colors.blue,
-      brightness: Brightness.light,
-    ),
+    colorScheme:
+        ColorScheme.fromSeed(
+          seedColor: const Color(0xFF2C974A),
+          brightness: Brightness.light,
+        ).copyWith(
+          primary: const Color(0xFF2C974A), // ← paksa primary persis hijau ini
+          onPrimary: Colors.white,
+        ),
     fontFamily: 'Roboto',
     appBarTheme: const AppBarTheme(
       centerTitle: true,
@@ -29,8 +33,11 @@ class AppTheme {
   static ThemeData get darkTheme => ThemeData(
     useMaterial3: true,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: Colors.blue,
+      seedColor: const Color(0xFF2C974A),
       brightness: Brightness.dark,
+    ).copyWith(
+      primary: const Color(0xFF2C974A),
+      onPrimary: Colors.white,
     ),
   );
 }

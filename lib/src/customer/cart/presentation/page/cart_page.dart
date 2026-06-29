@@ -109,46 +109,53 @@ class _CartPageState extends State<CartPage> with RouteAware {
 
               // List item
               Expanded(
-                child: ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: cartState.items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
-                  itemBuilder: (context, index) {
-                    final item = cartState.items[index];
-                    final isSelected = cartState.selectedIds.contains(item.id);
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    context.read<CartBloc>().add(const CartLoad());
+                  },
+                  child: ListView.separated(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: cartState.items.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      final item = cartState.items[index];
+                      final isSelected = cartState.selectedIds.contains(
+                        item.id,
+                      );
 
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Checkbox(
-                          value: isSelected,
-                          onChanged: (_) {
-                            context.read<CartBloc>().add(
-                              CartToggleSelect(cartItemId: item.id),
-                            );
-                          },
-                        ),
-                        Expanded(
-                          child: CartItemTile(
-                            item: item,
-                            onQuantityChanged: (newQty) {
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Checkbox(
+                            value: isSelected,
+                            onChanged: (_) {
                               context.read<CartBloc>().add(
-                                CartUpdateQuantity(
-                                  cartItemId: item.id,
-                                  quantity: newQty,
-                                ),
-                              );
-                            },
-                            onRemove: () {
-                              context.read<CartBloc>().add(
-                                CartRemoveItem(cartItemId: item.id),
+                                CartToggleSelect(cartItemId: item.id),
                               );
                             },
                           ),
-                        ),
-                      ],
-                    );
-                  },
+                          Expanded(
+                            child: CartItemTile(
+                              item: item,
+                              onQuantityChanged: (newQty) {
+                                context.read<CartBloc>().add(
+                                  CartUpdateQuantity(
+                                    cartItemId: item.id,
+                                    quantity: newQty,
+                                  ),
+                                );
+                              },
+                              onRemove: () {
+                                context.read<CartBloc>().add(
+                                  CartRemoveItem(cartItemId: item.id),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ),
 

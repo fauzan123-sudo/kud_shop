@@ -27,6 +27,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLoginRequested>(_onLogin);
     on<AuthRegisterRequested>(_onRegister);
     on<AuthLogoutRequested>(_onLogout);
+    on<AuthGetCurrentUser>(_onGetCurrentUser);
   }
 
   // Cek session saat app dibuka
@@ -80,6 +81,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold(
       (failure) => emit(AuthState.error(failure.message)),
       (_) => emit(const AuthState.unauthenticated()),
+    );
+  }
+
+  Future<void> _onGetCurrentUser(
+    AuthGetCurrentUser event,
+    Emitter<AuthState> emit,
+  ) async {
+    final result = await _getCurrentUser(const NoParams());
+    result.fold(
+      (_) => null, // diam saja kalau gagal
+      (user) => emit(AuthState.authenticated(user)),
     );
   }
 }

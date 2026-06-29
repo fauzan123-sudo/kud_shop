@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:kud_shop/core/error/exception.dart';
 import 'package:kud_shop/src/customer/order/domain/entities/order_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -66,7 +67,7 @@ class AdminOrderDataSourceImpl implements AdminOrderDataSource {
   OrderEntity _fromJson(Map<String, dynamic> json) {
     final address = json['addresses'] as Map<String, dynamic>?;
     final itemsJson = json['order_items'] as List;
-
+    debugPrint('address data: $address');
     return OrderEntity(
       id: json['id'] as int,
       totalPrice: (json['total_price'] as num).toDouble(),

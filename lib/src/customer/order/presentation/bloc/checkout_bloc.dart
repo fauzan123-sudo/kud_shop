@@ -52,8 +52,9 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     if (current is! CheckoutLoaded) return;
 
     final updatedItems = current.items.map((item) {
-      if (item.id == event.cartItemId)
+      if (item.id == event.cartItemId) {
         return item.copyWith(quantity: event.quantity);
+      }
       return item;
     }).toList();
 

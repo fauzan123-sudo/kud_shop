@@ -18,4 +18,6 @@ sealed class AuthEvent with _$AuthEvent {
   }) = AuthRegisterRequested;
 
   const factory AuthEvent.logout() = AuthLogoutRequested;
+    const factory AuthEvent.getCurrentUser() = AuthGetCurrentUser;
+
 }

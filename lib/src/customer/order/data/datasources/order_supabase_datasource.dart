@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:flutter/material.dart';
 import 'package:kud_shop/core/error/exception.dart';
 import 'package:kud_shop/src/customer/cart/domain/entities/cart_item_entity.dart';
 import 'package:kud_shop/src/customer/order/data/models/order_model.dart';
@@ -154,6 +155,9 @@ class OrderSupabaseDataSourceImpl implements OrderSupabaseDataSource {
         final product = item['products'] as Map<String, dynamic>;
         final stock = product['stock'] as int;
         final qty = item['quantity'] as int;
+        debugPrint(
+          'Update stok produk ${item['product_id']}: $stock - $qty = ${stock - qty}',
+        );
         await supabase
             .from('products')
             .update({'stock': stock - qty})

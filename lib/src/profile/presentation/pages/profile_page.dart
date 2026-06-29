@@ -69,93 +69,100 @@ class _ProfileContentState extends State<_ProfileContent> {
   Widget build(BuildContext context) {
     final user = _user;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          ProfileHeader(
-            name: user.name,
-            avatarUrl: user.avatarUrl,
-            isAdmin: user.isAdmin,
-          ),
-          const SizedBox(height: 24),
-          ProfileInfoCard(
-            title: 'INFORMASI AKUN',
-            items: [
-              ProfileInfoItem(
-                icon: Icons.person_outline,
-                label: 'Nama',
-                value: user.name,
-              ),
-              ProfileInfoItem(
-                icon: Icons.email_outlined,
-                label: 'Email',
-                value: user.email,
-              ),
-              ProfileInfoItem(
-                icon: Icons.phone_outlined,
-                label: 'Nomor HP',
-                value: user.phone ?? '-',
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          ProfileMenuButton(
-            icon: Icons.edit_outlined,
-            label: 'Edit Profil',
-            color: Colors.blue,
-            onTap: () async {
-              final updatedUser = await context.push<UserEntity>(
-                user.isAdmin
-                    ? AppRoutes.adminProfileEdit
-                    : AppRoutes.customerProfileEdit,
-              );
-              if (updatedUser != null && context.mounted) {
-                setState(() => _localOverride = updatedUser);
-              }
-            },
-          ),
-          const SizedBox(height: 8),
-          ProfileMenuButton(
-            icon: Icons.lock_outline,
-            label: 'Ubah Password',
-            color: Colors.purple,
-            onTap: () => context.push(
-              user.isAdmin
-                  ? AppRoutes.adminChangePassword
-                  : AppRoutes.customerChangePassword,
+    return RefreshIndicator(
+      onRefresh: () async {
+        context.read<AuthBloc>().add(const AuthEvent.getCurrentUser());
+        await Future.delayed(const Duration(milliseconds: 800));
+      },
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            ProfileHeader(
+              name: user.name,
+              avatarUrl: user.avatarUrl,
+              isAdmin: user.isAdmin,
             ),
-          ),
-          const SizedBox(height: 8),
-          ProfileMenuButton(
-            icon: Icons.location_on_outlined,
-            label: 'Alamat Saya',
-            color: Colors.green,
-            onTap: () => context.push(AppRoutes.customerAddressList),
-          ),
-          const SizedBox(height: 8),
-          ProfileMenuButton(
-            icon: Icons.receipt_long_outlined,
-            label: 'Riwayat Pesanan',
-            color: Colors.orange,
-            onTap: () => context.push(AppRoutes.customerOrderHistory),
-          ),
-          const SizedBox(height: 8),
-          const SizedBox(height: 8),
-          ProfileMenuButton(
-            icon: Icons.logout,
-            label: 'Keluar',
-            color: Colors.red,
-            onTap: () async {
-              final confirmed = await LogoutConfirmDialog.show(context);
-              if (!context.mounted) return;
-              if (confirmed == true) {
-                context.read<AuthBloc>().add(const AuthEvent.logout());
-              }
-            },
-          ),
-          const SizedBox(height: 24),
-        ],
+            const SizedBox(height: 24),
+            ProfileInfoCard(
+              title: 'INFORMASI AKUN',
+              items: [
+                ProfileInfoItem(
+                  icon: Icons.person_outline,
+                  label: 'Nama',
+                  value: user.name,
+                ),
+                ProfileInfoItem(
+                  icon: Icons.email_outlined,
+                  label: 'Email',
+                  value: user.email,
+                ),
+                ProfileInfoItem(
+                  icon: Icons.phone_outlined,
+                  label: 'Nomor HP',
+                  value: user.phone ?? '-',
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ProfileMenuButton(
+              icon: Icons.edit_outlined,
+              label: 'Edit Profil',
+              color: Colors.blue,
+              onTap: () async {
+                final updatedUser = await context.push<UserEntity>(
+                  user.isAdmin
+                      ? AppRoutes.adminProfileEdit
+                      : AppRoutes.customerProfileEdit,
+                );
+                if (updatedUser != null && context.mounted) {
+                  setState(() => _localOverride = updatedUser);
+                }
+              },
+            ),
+            const SizedBox(height: 8),
+            ProfileMenuButton(
+              icon: Icons.lock_outline,
+              label: 'Ubah Password',
+              color: Colors.purple,
+              onTap: () => context.push(
+                user.isAdmin
+                    ? AppRoutes.adminChangePassword
+                    : AppRoutes.customerChangePassword,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ProfileMenuButton(
+              icon: Icons.location_on_outlined,
+              label: 'Alamat Saya',
+              color: Colors.green,
+              onTap: () => context.push(AppRoutes.customerAddressList),
+            ),
+            const SizedBox(height: 8),
+            ProfileMenuButton(
+              icon: Icons.receipt_long_outlined,
+              label: 'Riwayat Pesanan',
+              color: Colors.orange,
+              onTap: () => context.push(AppRoutes.customerOrderHistory),
+            ),
+            const SizedBox(height: 8),
+            const SizedBox(height: 8),
+            ProfileMenuButton(
+              icon: Icons.logout,
+              label: 'Keluar',
+              color: Colors.red,
+              onTap: () async {
+                final confirmed = await LogoutConfirmDialog.show(context);
+                if (!context.mounted) return;
+                if (confirmed == true) {
+                  context.read<AuthBloc>().add(const AuthEvent.logout());
+                }
+              },
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
       ),
     );
   }

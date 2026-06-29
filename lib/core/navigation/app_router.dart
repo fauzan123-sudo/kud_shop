@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kud_shop/src/admin/category/presentation/pages/category_page.dart';
 import 'package:kud_shop/src/admin/dashboard/presentation/pages/admin_dashboard_page.dart';
+import 'package:kud_shop/src/admin/order/presentation/bloc/admin_order_bloc.dart';
+import 'package:kud_shop/src/admin/order/presentation/pages/admin_order_detail_page.dart';
 import 'package:kud_shop/src/admin/order/presentation/pages/admin_order_page.dart';
 import 'package:kud_shop/src/admin/product/domain/entities/product_entity.dart';
 import 'package:kud_shop/src/admin/product/presentation/bloc/product_bloc.dart';
@@ -122,6 +124,17 @@ class AppRouter {
         GoRoute(
           path: AppRoutes.adminChangePassword,
           builder: (_, __) => const ChangePasswordPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.adminOrderDetail,
+          builder: (context, state) {
+            final order = state.extra as OrderEntity;
+            return BlocProvider(
+              create: (_) =>
+                  sl<AdminOrderBloc>()..add(const AdminOrderEvent.load()),
+              child: AdminOrderDetailPage(order: order),
+            );
+          },
         ),
         GoRoute(
           path: AppRoutes.customerProfileEdit,

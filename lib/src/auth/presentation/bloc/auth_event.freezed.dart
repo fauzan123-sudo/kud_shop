@@ -55,14 +55,15 @@ extension AuthEventPatterns on AuthEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( AuthStarted value)?  started,TResult Function( AuthLoginRequested value)?  login,TResult Function( AuthRegisterRequested value)?  register,TResult Function( AuthLogoutRequested value)?  logout,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( AuthStarted value)?  started,TResult Function( AuthLoginRequested value)?  login,TResult Function( AuthRegisterRequested value)?  register,TResult Function( AuthLogoutRequested value)?  logout,TResult Function( AuthGetCurrentUser value)?  getCurrentUser,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case AuthStarted() when started != null:
 return started(_that);case AuthLoginRequested() when login != null:
 return login(_that);case AuthRegisterRequested() when register != null:
 return register(_that);case AuthLogoutRequested() when logout != null:
-return logout(_that);case _:
+return logout(_that);case AuthGetCurrentUser() when getCurrentUser != null:
+return getCurrentUser(_that);case _:
   return orElse();
 
 }
@@ -80,14 +81,15 @@ return logout(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( AuthStarted value)  started,required TResult Function( AuthLoginRequested value)  login,required TResult Function( AuthRegisterRequested value)  register,required TResult Function( AuthLogoutRequested value)  logout,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( AuthStarted value)  started,required TResult Function( AuthLoginRequested value)  login,required TResult Function( AuthRegisterRequested value)  register,required TResult Function( AuthLogoutRequested value)  logout,required TResult Function( AuthGetCurrentUser value)  getCurrentUser,}){
 final _that = this;
 switch (_that) {
 case AuthStarted():
 return started(_that);case AuthLoginRequested():
 return login(_that);case AuthRegisterRequested():
 return register(_that);case AuthLogoutRequested():
-return logout(_that);}
+return logout(_that);case AuthGetCurrentUser():
+return getCurrentUser(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -101,14 +103,15 @@ return logout(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( AuthStarted value)?  started,TResult? Function( AuthLoginRequested value)?  login,TResult? Function( AuthRegisterRequested value)?  register,TResult? Function( AuthLogoutRequested value)?  logout,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( AuthStarted value)?  started,TResult? Function( AuthLoginRequested value)?  login,TResult? Function( AuthRegisterRequested value)?  register,TResult? Function( AuthLogoutRequested value)?  logout,TResult? Function( AuthGetCurrentUser value)?  getCurrentUser,}){
 final _that = this;
 switch (_that) {
 case AuthStarted() when started != null:
 return started(_that);case AuthLoginRequested() when login != null:
 return login(_that);case AuthRegisterRequested() when register != null:
 return register(_that);case AuthLogoutRequested() when logout != null:
-return logout(_that);case _:
+return logout(_that);case AuthGetCurrentUser() when getCurrentUser != null:
+return getCurrentUser(_that);case _:
   return null;
 
 }
@@ -125,13 +128,14 @@ return logout(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  started,TResult Function( String email,  String password)?  login,TResult Function( String name,  String email,  String password)?  register,TResult Function()?  logout,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  started,TResult Function( String email,  String password)?  login,TResult Function( String name,  String email,  String password)?  register,TResult Function()?  logout,TResult Function()?  getCurrentUser,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case AuthStarted() when started != null:
 return started();case AuthLoginRequested() when login != null:
 return login(_that.email,_that.password);case AuthRegisterRequested() when register != null:
 return register(_that.name,_that.email,_that.password);case AuthLogoutRequested() when logout != null:
-return logout();case _:
+return logout();case AuthGetCurrentUser() when getCurrentUser != null:
+return getCurrentUser();case _:
   return orElse();
 
 }
@@ -149,13 +153,14 @@ return logout();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  started,required TResult Function( String email,  String password)  login,required TResult Function( String name,  String email,  String password)  register,required TResult Function()  logout,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  started,required TResult Function( String email,  String password)  login,required TResult Function( String name,  String email,  String password)  register,required TResult Function()  logout,required TResult Function()  getCurrentUser,}) {final _that = this;
 switch (_that) {
 case AuthStarted():
 return started();case AuthLoginRequested():
 return login(_that.email,_that.password);case AuthRegisterRequested():
 return register(_that.name,_that.email,_that.password);case AuthLogoutRequested():
-return logout();}
+return logout();case AuthGetCurrentUser():
+return getCurrentUser();}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -169,13 +174,14 @@ return logout();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  started,TResult? Function( String email,  String password)?  login,TResult? Function( String name,  String email,  String password)?  register,TResult? Function()?  logout,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  started,TResult? Function( String email,  String password)?  login,TResult? Function( String name,  String email,  String password)?  register,TResult? Function()?  logout,TResult? Function()?  getCurrentUser,}) {final _that = this;
 switch (_that) {
 case AuthStarted() when started != null:
 return started();case AuthLoginRequested() when login != null:
 return login(_that.email,_that.password);case AuthRegisterRequested() when register != null:
 return register(_that.name,_that.email,_that.password);case AuthLogoutRequested() when logout != null:
-return logout();case _:
+return logout();case AuthGetCurrentUser() when getCurrentUser != null:
+return getCurrentUser();case _:
   return null;
 
 }
@@ -377,6 +383,38 @@ int get hashCode => runtimeType.hashCode;
 @override
 String toString() {
   return 'AuthEvent.logout()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class AuthGetCurrentUser implements AuthEvent {
+  const AuthGetCurrentUser();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthGetCurrentUser);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'AuthEvent.getCurrentUser()';
 }
 
 

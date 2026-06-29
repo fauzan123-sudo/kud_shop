@@ -280,7 +280,10 @@ class _AdminOrderDetailPageState extends State<AdminOrderDetailPage> {
             style: AppTextStyle.bodySmall.copyWith(color: Colors.grey.shade600),
           ),
           const SizedBox(height: 4),
-          Text('Rp ${CurrencyFormatter.format(_order.totalPrice)}', style: AppTextStyle.h3),
+          Text(
+            'Rp ${CurrencyFormatter.format(_order.totalPrice)}',
+            style: AppTextStyle.h3,
+          ),
         ],
       ),
     );
